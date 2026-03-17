@@ -1055,7 +1055,7 @@
                 const genAI = new window.GoogleGenerativeAIConstructor(apiKey);
                 const model = genAI.getGenerativeModel(
                     { model: "gemini-1.5-flash" },
-                    { apiVersion: "v1beta" }
+                    { apiVersion: "v1" }
                 );
 
                 const result = await model.generateContent([
