@@ -60,7 +60,7 @@
             font-family: 'Outfit', sans-serif; color: #fff; direction: ltr;
             text-decoration: none;
         }
-        .brand-logo::after { content: 'v4.7'; font-size: 0.6rem; color: var(--neon-cyan); margin-left:10px; opacity: 0.6; }
+        .brand-logo::after { content: 'v4.8'; font-size: 0.6rem; color: var(--neon-cyan); margin-left:10px; opacity: 0.6; }
 
         .logo-icon {
             width: 34px; height: 34px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
@@ -1012,9 +1012,12 @@
                 return;
             }
 
-            const userApiKey = localStorage.getItem('geminiApiKey');
-            const defaultKey = "AIzaSyC7f4QH6CSRN6dAhGNm7P4kMHTv12mtdEo"; // User's requested default key
-            const apiKey = userApiKey || defaultKey;
+            const apiKey = localStorage.getItem('geminiApiKey');
+            if (!apiKey) {
+                alert("براہ کرم اپنی Gemini API Key سیٹ کریں۔ ڈیفالٹ کی (Firebase Key) کام نہیں کرے گی۔");
+                document.getElementById('apiSettingsModal').classList.remove('hidden');
+                return;
+            }
             
             document.getElementById('scanningModal').classList.remove('hidden');
             const base64Data = currentImageBase64.split(',')[1];
@@ -1063,15 +1066,17 @@
                 console.error("CRITICAL DEBUG: Full Error Object:", e);
                 let readableError = e.message || "Unknown Error";
                 
+                // Real-time Urdu translation for clarity
+                let urduMsg = "تجزیہ کے دوران خرابی پیش آئی: ";
                 if (readableError.includes("API key not valid")) {
-                    readableError = "آپ کی API Key درست نہیں ہے۔ براہ کرم نئی کی حاصل کریں۔";
+                    urduMsg += "آپ کی API Key درست نہیں ہے۔";
                 } else if (readableError.includes("Quota exceeded")) {
-                    readableError = "آپ کے فری کریڈٹ (Quota) ختم ہو گئے ہیں۔";
-                } else if (readableError.includes("Model") || readableError.includes("found")) {
-                    readableError = "Gemini Model (gemini-1.5-flash) v1beta پر دستیاب نہیں ہے۔";
+                    urduMsg += "آپ کے فری کریڈٹ ختم ہو گئے ہیں۔";
+                } else {
+                    urduMsg += readableError; // Show the actual technical error for debugging
                 }
                 
-                alert("تجزیہ کے دوران خرابی پیش آئی: " + readableError);
+                alert(urduMsg + "\n\n(See F12 console for details)");
                 document.getElementById('scanningModal').classList.add('hidden');
             }
         };
