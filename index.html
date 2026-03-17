@@ -50,7 +50,7 @@
             display: flex; justify-content: space-between; align-items: center;
             padding: 12px 60px; background: rgba(2, 6, 12, 0.85); backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-dim); font-size: 14px; z-index: 1000;
-            height: 70px;
+            height: 70px; position: relative;
         }
 
         .nav-left, .nav-right { display: flex; align-items: center; gap: 20px; }
@@ -231,7 +231,7 @@
         .avatar { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--neon-cyan); overflow: hidden; box-shadow: 0 0 10px rgba(0,229,255,0.3); }
 
         .profile-dropdown {
-            position: absolute; top: calc(100% + 15px); left: 0; width: 300px;
+            position: absolute; top: calc(100% + 15px); right: 0; width: 260px;
             background: rgba(8, 14, 25, 0.7); backdrop-filter: blur(40px) saturate(180%);
             border: 1px solid rgba(0, 229, 255, 0.2); border-radius: 24px;
             padding: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 229, 255, 0.1);
@@ -781,7 +781,7 @@
 
             const avatarHtml = userState.photoURL 
                 ? `<img src="${userState.photoURL}" alt="User">` 
-                : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:var(--neon-cyan); color:#000; font-weight:bold;">${user.email[0].toUpperCase()}</div>`;
+                : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:var(--warning-orange); color:#000; font-weight:bold; font-size:1.2rem;">${user.email[0].toUpperCase()}</div>`;
             
             const savedApiKey = localStorage.getItem('geminiApiKey') || '';
 
