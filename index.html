@@ -60,7 +60,7 @@
             font-family: 'Outfit', sans-serif; color: #fff; direction: ltr;
             text-decoration: none;
         }
-        .brand-logo::after { content: 'v5.2'; font-size: 0.6rem; color: var(--neon-cyan); margin-left:10px; opacity: 0.6; }
+        .brand-logo::after { content: 'v5.3'; font-size: 0.6rem; color: var(--neon-cyan); margin-left:10px; opacity: 0.6; }
 
         .logo-icon {
             width: 34px; height: 34px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
@@ -671,6 +671,8 @@
             <div class="scan-text">AI SCANNING...</div>
             <p style="color: var(--text-muted); font-size: 0.9rem; font-family: 'Noto Nastaliq Urdu';">ڈیزائن کا گہرائی سے جائزہ لیا جا رہا ہے</p>
         </div>
+    </div>
+
     <!-- Design History Modal -->
     <div id="historyModal" class="modal hidden">
         <div class="modal-content" style="max-width: 900px; height: 80vh;">
@@ -887,7 +889,7 @@
                     const isShowing = dropdown.classList.toggle('show');
                     if (isShowing) {
                         const currentKey = localStorage.getItem('geminiApiKey') || '';
-                        const input = document.getElementById('dropdownApiKeyInput');
+                        const input = document.getElementById('apiKeyInput');
                         if (input) input.value = currentKey;
                     }
                 };
@@ -1027,11 +1029,12 @@
             }`;
 
             try {
-                // ULTIMATE STABILITY FIX: Strictly using gemini-1.5-flash with v1 fallback/check
+                // ULTIMATE STABILITY FIX: Strictly using gemini-1.5-flash
+                // Attempting v1beta first as it's often more compatible with newest models
                 const genAI = new window.GoogleGenerativeAIConstructor(apiKey);
                 const model = genAI.getGenerativeModel(
                     { model: "gemini-1.5-flash" },
-                    { apiVersion: "v1" }
+                    { apiVersion: "v1beta" }
                 );
 
                 const result = await model.generateContent([
