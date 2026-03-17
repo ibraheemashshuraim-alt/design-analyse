@@ -60,7 +60,7 @@
             font-family: 'Outfit', sans-serif; color: #fff; direction: ltr;
             text-decoration: none;
         }
-        .brand-logo::after { content: 'v5.3'; font-size: 0.6rem; color: var(--neon-cyan); margin-left:10px; opacity: 0.6; }
+        .brand-logo::after { content: 'v5.4'; font-size: 0.6rem; color: var(--neon-cyan); margin-left:10px; opacity: 0.6; }
 
         .logo-icon {
             width: 34px; height: 34px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
@@ -347,6 +347,27 @@
         }
 
         .hidden { display: none !important; }
+        
+        /* Modal Base System */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 2000; transition: 0.3s;
+        }
+        .modal-content {
+            background: var(--bg-card); border: 1px solid var(--border-glow);
+            border-radius: 32px; padding: 40px; position: relative;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.6);
+            animation: modal-slide 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        @keyframes modal-slide { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .close-btn {
+            position: absolute; top: 20px; right: 25px; font-size: 1.8rem;
+            color: var(--text-muted); cursor: pointer; transition: 0.3s;
+        }
+        .close-btn:hover { color: #ff5252; transform: rotate(90deg); }
 
         @media screen and (max-width: 1000px) {
             .cards-container { grid-template-columns: 1fr; overflow-y: auto; }
@@ -919,7 +940,7 @@
 
                     <div class="action-grid-premium">
                         <div class="action-item" onclick="openApiSettings(event)">
-                            <i class="fa-solid fa-gear"></i>
+                            <i class="fa-solid fa-key"></i>
                             <span>Settings</span>
                         </div>
 
