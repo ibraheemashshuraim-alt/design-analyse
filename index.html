@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DesignCheck - Premium AI Critique</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Outfit:wght@300;400;500;600;700&family=Jameel+Noori+Nastaleeq&family=Roboto:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;600&family=Inter:wght@300;400;500;600&family=Tajawal:wght@300;400;500;700&family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@400;700&family=Lalezar&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-dark: #050b14;
+            --bg-card: #0a1320;
+            --bg-card-hover: #0d1a2d;
+            --text-main: #ffffff;
+            --text-muted: #8ba5b0;
+            --neon-cyan: #00f0ff;
+            --neon-purple: #b500ff;
+            --border-dim: rgba(0, 240, 255, 0.15);
+            --border-glow: rgba(0, 240, 255, 0.5);
+            --panel-bg: #0c1626;
+            --success-green: #00e676;
+            --warning-orange: #ff9100;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            font-family: 'Outfit', 'Noto Nastaliq Urdu', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .background-backdrop {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: radial-gradient(circle at top right, rgba(0, 240, 255, 0.05) 0%, transparent 40%),
+                        radial-gradient(circle at bottom left, rgba(181, 0, 255, 0.05) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        /* Nav Bar */
+        .top-nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 40px; background: rgba(5, 11, 20, 0.8); backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border-dim); font-size: 14px; position: sticky; top: 0; z-index: 1000;
+        }
+
+        .nav-left, .nav-right { display: flex; align-items: center; gap: 15px; }
+
+        .brand-logo {
+            display: flex; align-items: center; font-size: 1.6rem; font-weight: 800;
+            font-family: 'Outfit', sans-serif; color: var(--text-main); direction: ltr;
+            text-decoration: none; position: relative;
+        }
+
+        .logo-icon {
+            width: 38px; height: 38px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            border-radius: 10px; display: flex; justify-content: center; align-items: center;
+            margin-right: 12px; color: #fff; font-size: 1.2rem; 
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); transform: scale(1); }
+            50% { box-shadow: 0 0 30px rgba(0, 240, 255, 0.7); transform: scale(1.05); }
+        }
+
+        .ai-badge {
+            font-size: 0.65rem; background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple)); 
+            padding: 2px 8px; border-radius: 4px; margin-left: 8px; color: white;
+            letter-spacing: 1px; font-weight: 700; border: none;
+        }
+
+        /* 3-Column Layout */
+        .app-container {
+            display: grid;
+            grid-template-columns: 80px 1fr 340px;
+            height: calc(100vh - 60px);
+            overflow: hidden;
+        }
+
+        /* Left Sidebar Tools */
+        .editor-sidebar {
+            background: rgba(10, 19, 32, 0.6);
+            border-right: 1px solid var(--border-dim);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            gap: 20px;
+            z-index: 10;
+        }
+
+        .sidebar-tool-btn {
+            width: 50px; height: 50px; border-radius: 12px; border: 1px solid transparent;
+            background: rgba(255,255,255,0.03); color: var(--text-muted);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            cursor: pointer; transition: 0.2s; font-size: 1.2rem;
+            position: relative;
+        }
+        .sidebar-tool-btn:hover { background: rgba(0, 240, 255, 0.1); color: var(--neon-cyan); border-color: var(--border-dim); }
+        .sidebar-tool-btn.active { background: rgba(0, 240, 255, 0.15); color: var(--neon-cyan); border-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0,240,255,0.2); }
+        .sidebar-tool-btn span { font-size: 0.6rem; margin-top: 4px; font-weight: 500; font-family: 'Outfit'; }
+
+        /* Canvas Area (Center) */
+        .canvas-area {
+            position: relative;
+            background: #050b14;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            overflow: auto;
+        }
+
+        .canvas-container { 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.05);
+            background: #000;
+        }
+
+        /* Right Panel (Results) */
+        .analysis-panel {
+            background: var(--bg-card);
+            border-left: 1px solid var(--border-dim);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Nav Buttons */
+        .nav-btn {
+            background: none; border: none; color: var(--text-muted); cursor: pointer;
+            font-family: 'Outfit', sans-serif; display: flex; align-items: center; gap: 8px; transition: 0.3s ease;
+        }
+
+        .nav-btn:hover { color: var(--text-main); }
+        /* Removed .nav-btn.active as redundant */
+
+        .gear-btn-nav {
+            background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; transition: 0.3s;
+            width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
+        .gear-btn-nav:hover { color: var(--neon-cyan); background: rgba(255,255,255,0.05); }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer;
+            font-weight: 600; font-family: 'Outfit', sans-serif; transition: all 0.3s ease;
+        }
+
+        .google-login-btn {
+            background: #ffffff; color: #000000; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .google-login-btn:hover { background: #f0f0f0; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,255,255,0.2); }
+
+        .profile-chip {
+            display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05);
+            padding: 5px 12px; border-radius: 25px; border: 1px solid var(--border-dim); direction: ltr;
+            cursor: pointer; transition: 0.3s; position: relative;
+        }
+        .profile-chip:hover { background: rgba(255,255,255,0.1); border-color: var(--neon-cyan); }
+        .avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--neon-cyan); overflow: hidden; }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Profile Dropdown */
+        .profile-dropdown {
+            position: absolute; top: calc(100% + 15px); left: 0; width: 280px;
+            background: rgba(10, 22, 38, 0.95); backdrop-filter: blur(20px);
+            border: 1px solid var(--border-dim); border-radius: 18px;
+            padding: 20px; box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+            display: none; flex-direction: column; gap: 15px; z-index: 1100;
+            animation: slide-up-fade 0.3s ease-out;
+            cursor: default;
+        }
+        .profile-dropdown.show { display: flex; }
+
+        @keyframes slide-up-fade {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-info-box {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-dim);
+            padding: 12px; border-radius: 12px; text-align: left;
+        }
+        .user-info-box .name { font-weight: 700; color: #fff; font-size: 0.95rem; display: block; }
+        .user-info-box .email { font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 2px; }
+
+        .dropdown-menu-item {
+            display: flex; align-items: center; gap: 12px; color: var(--text-main);
+            padding: 10px 12px; border-radius: 10px; cursor: pointer; transition: 0.2s;
+            text-decoration: none; font-size: 0.9rem; border: 1px solid transparent;
+        }
+        .dropdown-menu-item:hover { background: rgba(0, 240, 255, 0.1); color: var(--neon-cyan); border-color: rgba(0,240,255,0.2); }
+        .dropdown-menu-item.logout { color: #ff5252; }
+        .dropdown-menu-item.logout:hover { background: rgba(255, 82, 82, 0.1); border-color: rgba(255, 82, 82, 0.2); }
+
+        .credits-indicator {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 12px; background: rgba(0, 240, 255, 0.05);
+            border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 10px;
+            font-size: 0.85rem; color: var(--neon-cyan); font-weight: 600;
+        }
+
+        .buy-credits-btn {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            color: #fff; border: none; padding: 12px; border-radius: 10px;
+            font-weight: 700; cursor: pointer; text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: 0.3s;
+        }
+        .buy-credits-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,240,255,0.3); }
+
+        /* Modals */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+        .modal-content { background: var(--panel-bg); border: 1px solid var(--border-dim); border-radius: 20px; padding: 30px; width: 90%; position: relative; box-shadow: 0 20px 80px rgba(0,0,0,1); }
+        .close-btn { position: absolute; top: 20px; right: 20px; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; }
+        .close-btn:hover { color: #fff; }
+
+        /* Results Display */
+        .results-header { padding: 20px; border-bottom: 1px solid var(--border-dim); background: rgba(0,0,0,0.2); }
+        .status-badge { font-size: 0.8rem; font-weight: 700; color: var(--neon-cyan); letter-spacing: 1px; }
+        
+        .result-scroll { flex: 1; padding: 20px; overflow-y: auto; }
+        .result-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border-dim); border-radius: 12px; padding: 15px; margin-bottom: 15px; }
+        .result-label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; }
+        .result-value { font-size: 0.95rem; color: #fff; }
+
+        .report-section { margin-top: 15px; }
+        .report-title { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: 600; margin-bottom: 10px; }
+        .chip { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; margin: 0 4px 6px 0; border: 1px solid transparent; }
+        .chip-success { background: rgba(0, 230, 118, 0.1); border-color: rgba(0, 230, 118, 0.3); color: var(--success-green); }
+        .chip-warning { background: rgba(255, 145, 0, 0.1); border-color: rgba(255, 145, 0, 0.3); color: var(--warning-orange); }
+
+        .hidden { display: none !important; }
+
+        /* User List Admin */
+        .user-list-table { width: 100%; border-collapse: collapse; margin-top: 20px; color: white; }
+        .user-list-table th, .user-list-table td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border-dim); }
+        .user-list-table th { color: var(--text-muted); font-size: 0.85rem; }
+        .action-btn { padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; border: none; }
+        .logout-btn { background: var(--warning-orange); color: #000; }
+        .block-btn { background: #ff5252; color: #fff; }
+
+        /* Print Styles */
+        @media print {
+            .top-nav, .editor-sidebar, .results-header button, .results-header .status-badge,
+            .results-scroll-area::-webkit-scrollbar, footer, .modal, .btn-nav, .analysis-panel .results-header {
+                display: none !important;
+            }
+            .app-container { display: block !important; height: auto !important; }
+            .analysis-panel { border: none !important; width: 100% !important; max-height: none !important; overflow: visible !important; }
+            .canvas-area { display: none !important; }
+            body, html { background: #fff !important; color: #000 !important; font-size: 12pt !important; }
+            .result-card { border: 1px solid #ddd !important; background: #fff !important; color: #000 !important; page-break-inside: avoid; }
+            .result-label { color: #666 !important; }
+            .result-value { color: #000 !important; }
+            .chip { border: 1px solid #ccc !important; color: #000 !important; background: #f9f9f9 !important; }
+            #overallScoreText { color: #000 !important; }
+        }
+        #profileEmail { word-break: break-all; max-width: 100%; font-size: 1rem; }
+
+        @media screen and (max-width: 1100px) {
+            .app-container { grid-template-columns: 80px 1fr; }
+            .analysis-panel { position: fixed; right: -340px; top: 60px; height: calc(100vh - 60px); width: 340px; transition: 0.3s; z-index: 100; }
+            .analysis-panel.show { right: 0; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background-backdrop"></div>
+
+    <nav class="top-nav">
+        <div class="nav-left">
+            <div class="brand-logo">
+                <div class="logo-icon"><i class="fa-solid fa-check"></i></div>
+                <span class="brand-name">DesignCheck</span>
+                <span class="ai-badge">AI</span>
+            </div>
+        </div>
+        <div class="nav-right">
+            <select id="outputLangSelect" style="background:rgba(255,255,255,0.05); color:var(--text-main); border:1px solid var(--border-dim); padding:8px 12px; border-radius:8px; font-family:'Outfit', 'Noto Nastaliq Urdu'; outline:none; cursor:pointer; backdrop-filter: blur(10px);">
+                <option value="Urdu">اردو (Urdu)</option>
+                <option value="English">English</option>
+                <option value="Hindi">हिन्दी (Hindi)</option>
+                <option value="Arabic">العربية (Arabic)</option>
+            </select>
+            <div id="authContainer" style="display: flex; align-items: center; gap: 10px;">
+                <button class="btn google-login-btn" id="loginBtn">
+                    <i class="fa-brands fa-google"></i> Sign In
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="app-container">
+        <!-- Sidebar Tools -->
+        <aside class="editor-sidebar">
+            <button class="sidebar-tool-btn active" id="toolSelect" onclick="setEditorTool('select')">
+                <i class="fa-solid fa-mouse-pointer"></i>
+                <span>Select</span>
+            </button>
+            <button class="sidebar-tool-btn" id="toolText" onclick="addEditorText()">
+                <i class="fa-solid fa-font"></i>
+                <span>Text</span>
+            </button>
+            <button class="sidebar-tool-btn" id="toolShape" onclick="toggleShapeMenu()">
+                <i class="fa-solid fa-shapes"></i>
+                <span>Shapes</span>
+            </button>
+            <button class="sidebar-tool-btn" id="toolUpload" onclick="document.getElementById('fileInput').click()">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <span>Upload</span>
+            </button>
+            <button class="sidebar-tool-btn" id="toolBgRemove" onclick="removeBackground()">
+                <i class="fa-solid fa-wand-magic"></i>
+                <span>BG Remove</span>
+            </button>
+            <div style="flex:1"></div>
+            <button class="sidebar-tool-btn" onclick="deleteSelectedObject()" style="color:#ff5252">
+                <i class="fa-solid fa-trash-can"></i>
+                <span>Delete</span>
+            </button>
+        </aside>
+
+        <main class="canvas-area" id="dropZone">
+            <input type="file" id="fileInput" accept="image/*" hidden>
+            <div id="canvasPlaceholder" style="text-align:center; color:rgba(255,255,255,0.2);">
+                <i class="fa-solid fa-photo-film" style="font-size:3rem; display:block; margin-bottom:15px;"></i>
+                <p>ڈیزائن یہاں ڈریگ کریں یا اپلوڈ کریں</p>
+                <div style="margin-top:15px; font-size:0.8rem; opacity:0.6;">(Drag or Upload to Start)</div>
+            </div>
+            <canvas id="editorCanvas" class="hidden"></canvas>
+        </main>
+
+        <!-- Results Panel -->
+        <aside class="analysis-panel" id="resultsPanel">
+            <div class="results-header">
+                <div class="status-badge" id="panelHeaderText">ANALYSIS READY</div>
+                <div style="display:flex; gap:10px; margin-top:15px;">
+                    <button class="btn browse-btn" style="flex:1; padding:8px; font-size:0.8rem;" onclick="runFullAudit()">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Run AI Audit
+                    </button>
+                </div>
+            </div>
+
+            <div class="result-scroll">
+                <!-- Overall Score -->
+                <div class="result-card">
+                    <div class="result-label">Design Score</div>
+                    <div style="font-size:2rem; font-weight:700; color:var(--neon-cyan);" id="overallScoreText">--</div>
+                </div>
+
+                <!-- Accessibility Check -->
+                <div class="result-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div class="result-label">Accessibility</div>
+                        <i class="fa-solid fa-eye" style="color:var(--neon-cyan)"></i>
+                    </div>
+                    <div class="result-value" id="accessOut">Waiting for audit...</div>
+                </div>
+
+                <!-- Color Contrast -->
+                <div class="result-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div class="result-label">Color Contrast</div>
+                        <i class="fa-solid fa-palette" style="color:var(--neon-purple)"></i>
+                    </div>
+                    <div class="result-value" id="contrastOut">Waiting for audit...</div>
+                </div>
+
+                <!-- Detailed Report -->
+                <div class="report-section" id="reportGoodSection">
+                    <div class="report-title"><i class="fa-solid fa-circle-check" style="color:var(--success-green)"></i> Strengths</div>
+                    <div id="reportGoodOut"></div>
+                </div>
+
+                <div class="report-section" id="reportBadSection">
+                    <div class="report-title"><i class="fa-solid fa-circle-exclamation" style="color:var(--warning-orange)"></i> Areas to Improve</div>
+                    <div id="reportBadOut"></div>
+                </div>
+
+                <div style="margin-top:20px; display:flex; gap:10px;">
+                    <button class="btn mini-action-btn print-btn" onclick="window.print()" style="flex:1">
+                        <i class="fa-solid fa-print"></i> Print
+                    </button>
+                    <button class="btn mini-action-btn pdf-btn" onclick="exportPDF()" style="flex:1">
+                        <i class="fa-solid fa-file-pdf"></i> PDF
+                    </button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Consolidated Modals Section -->
+    <div id="adminModal" class="modal hidden">
+        <div class="modal-content" style="max-width: 800px;">
+            <span class="close-btn" onclick="document.getElementById('adminModal').classList.add('hidden')">&times;</span>
+            <h2 style="color:var(--neon-cyan); margin-bottom:20px;"><i class="fa-solid fa-shield-halved"></i> Admin Management</h2>
+            <div style="max-height: 500px; overflow-y: auto;">
+                <table class="user-list-table">
+                    <thead>
+                        <tr>
+                            <th>Joined At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminUserListBody">
+                        <tr><td colspan="5" style="text-align:center;">Loading users...</td></tr>
+                    </tbody>
+                </table>
+
+                <h2 style="color:var(--neon-cyan); margin:30px 0 20px;"><i class="fa-solid fa-receipt"></i> Payment Requests</h2>
+                <table class="user-list-table">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>TID</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentRequestsBody">
+                        <tr><td colspan="5" style="text-align:center;">No pending requests.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="modal hidden">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="close-btn" onclick="document.getElementById('settingsModal').classList.add('hidden')">&times;</span>
+            <h2 style="color:var(--neon-cyan); margin-bottom:20px;"><i class="fa-solid fa-universal-access"></i> Display Settings</h2>
+            <div style="display:flex; flex-direction:column; gap:20px; text-align:left;">
+                <div>
+                    <label style="display:block; margin-bottom:10px;">Font Size: <span id="fontSizeDisplay">100%</span></label>
+                    <input type="range" id="fontSizeSlider" min="80" max="150" value="100" style="width:100%; accent-color:var(--neon-cyan);">
+                </div>
+                <div>
+                    <label style="display:block; margin-bottom:10px;">Font Family</label>
+                    <select id="fontFamilySelect" style="width:100%; background:var(--bg-dark); color:white; border:1px solid var(--border-dim); padding:10px; border-radius:8px;">
+                        <option value="'Outfit', sans-serif">Modern Outfit</option>
+                        <option value="'Noto Nastaliq Urdu', serif">Nastaliq Urdu</option>
+                        <option value="'Inter', sans-serif">Professional Inter</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn browse-btn" style="width:100%; margin-top:20px;" onclick="document.getElementById('settingsModal').classList.add('hidden')">Done</button>
+        </div>
+    </div>
+
+    <div id="apiSettingsModal" class="modal hidden">
+        <div class="modal-content" style="max-width: 450px;">
+            <span class="close-btn" onclick="document.getElementById('apiSettingsModal').classList.add('hidden')">&times;</span>
+            <h2 style="color:var(--neon-cyan); margin-bottom:15px;"><i class="fa-solid fa-key"></i> API Configuration</h2>
+            <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:20px;">Gemini API Key ڈالیں تاکہ AI تجزیہ کیا جا سکے۔</p>
+            <input type="password" id="apiKeyInput" placeholder="Sk-..." style="width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--border-dim); color:white; padding:12px; border-radius:8px; margin-bottom:15px; font-family:monospace;">
+            <div style="display:flex; gap:10px;">
+                <button class="btn browse-btn" id="saveApiKeyBtn" onclick="saveApiKey()" style="flex:1;">Save Key</button>
+                <button class="btn outline-btn hidden" id="editApiKeyBtn" onclick="editApiKey()" style="flex:0.5;">Edit</button>
+            </div>
+            <p id="apiHintText" style="margin-top:10px; font-size:0.8rem; color:var(--text-muted); text-align:center;"></p>
+        </div>
+    </div>
+
+    <div id="upgradeModal" class="modal hidden">
+        <div class="modal-content" style="max-width: 480px;">
+            <span class="close-btn" onclick="document.getElementById('upgradeModal').classList.add('hidden')">&times;</span>
+            <div style="text-align: center; margin-bottom: 25px;">
+                <div style="font-size: 3rem; color: var(--neon-cyan); margin-bottom: 10px;"><i class="fa-solid fa-crown"></i></div>
+                <h2 style="color: white;">Get More Credits</h2>
+                <p style="color: var(--text-muted);">پریمیم تجزیہ کے لیے مزید کریڈٹس حاصل کریں</p>
+            </div>
+            
+            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-dim); border-radius:15px; padding:20px; margin-bottom:20px;">
+                <h4 style="color:var(--neon-cyan); margin-bottom:15px;"><i class="fa-solid fa-building-columns"></i> Payment Details (SadaPay)</h4>
+                <div style="display:flex; flex-direction:column; gap:8px; font-size:0.9rem; color:#fff;">
+                    <div style="display:flex; justify-content:space-between;"><span>Account Name:</span> <strong style="color:var(--neon-cyan);">Ibraheem Ashshuraim</strong></div>
+                    <div style="display:flex; justify-content:space-between;"><span>Account Number:</span> <strong style="color:var(--neon-cyan);">0300-1234567</strong></div>
+                    <div style="display:flex; justify-content:space-between;"><span>Amount:</span> <strong>Rs. 500 for 100 Credits</strong></div>
+                </div>
+            </div>
+
+            <div style="text-align:left;">
+                <label style="color:var(--text-muted); font-size:0.8rem; display:block; margin-bottom:8px;">Submit Transaction ID (TID)</label>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="tidInput" placeholder="Enter TID (e.g. 12345678)" style="flex:1; background:rgba(0,0,0,0.3); border:1px solid var(--border-dim); color:white; padding:12px; border-radius:10px; outline:none; transition:0.3s;" onfocus="this.style.borderColor='var(--neon-cyan)'">
+                    <button class="btn browse-btn" onclick="submitTID()" id="tidSubmitBtn" style="padding:0 25px;">Submit</button>
+                </div>
+                <p style="font-size:0.75rem; color:var(--text-muted); margin-top:10px; text-align:center;">TID جمع کرانے پر آپ کو فوری طور پر 5 ٹرائل کریڈٹ مل جائیں گے۔</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="profileModal" class="modal hidden">
+        <div class="modal-content" style="max-width: 500px; text-align:center;">
+            <span class="close-btn" onclick="document.getElementById('profileModal').classList.add('hidden')">&times;</span>
+            <div id="profileAvatar" style="width:80px; height:80px; border-radius:50%; background:var(--neon-cyan); margin:0 auto 15px; display:flex; align-items:center; justify-content:center; font-size:2rem; font-weight:700; color:#000; overflow:hidden;">U</div>
+            <h3 id="profileEmail" style="color:white; margin-bottom:5px;">user@example.com</h3>
+            <div style="display:flex; justify-content:center; gap:10px; margin-bottom:20px;">
+                <span id="profilePlan" style="background:rgba(0,240,255,0.1); border:1px solid var(--neon-cyan); color:var(--neon-cyan); padding:4px 12px; border-radius:15px; font-size:0.8rem;">Free Plan</span>
+                <span id="profileCreditsDisplay" style="background:rgba(255,255,255,0.05); border:1px solid var(--text-muted); color:var(--text-muted); padding:4px 12px; border-radius:15px; font-size:0.8rem;">10 Credits</span>
+            </div>
+            
+            <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-dim); border-radius:12px; padding:15px; margin-bottom:20px; text-align:left;">
+                <label style="color:var(--text-muted); font-size:0.8rem;">Add Credits (Rs. 500 for 100 Credits)</label>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <input type="text" id="tidInput" placeholder="Transaction ID (TID)" style="flex:1; background:rgba(0,0,0,0.3); border:1px solid var(--border-dim); color:white; padding:10px; border-radius:8px;">
+                    <button class="btn browse-btn" onclick="submitTID()" style="padding:10px 15px;">Submit</button>
+                </div>
+                <p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">5 Credits will be added instantly.</p>
+            </div>
+
+            <button class="btn outline-btn" id="profileLogoutBtn" style="width:100%; border-color:#ff5252; color:#ff5252;" onclick="signOutUser()">Logout</button>
+            <div style="margin-top:15px;">
+                <button class="btn nav-btn" id="profileHistoryBtn" onclick="openHistory()" style="margin:0 auto;"><i class="fa-solid fa-clock-rotate-left"></i> View History</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="historyModal" class="modal hidden">
+        <div class="modal-content" style="max-width: 900px; height: 80vh;">
+            <span class="close-btn" onclick="document.getElementById('historyModal').classList.add('hidden')">&times;</span>
+            <h2 style="color:var(--neon-cyan); margin-bottom:20px;"><i class="fa-solid fa-clock-rotate-left"></i> Design History</h2>
+            <div class="history-grid" id="historyContainer" style="overflow-y:auto; height:calc(100% - 60px);"></div>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="modal hidden" style="z-index: 2000;">
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <div class="spinner"></div>
+            <h2 style="color:var(--neon-cyan); font-family:'Outfit'; margin-top:20px;">AI Scanning...</h2>
+            <p style="color:var(--text-muted);">Analyzing layout & extracting color palette.</p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="ft-left">Powered by <strong style="color: #00f0ff;">Gemini AI</strong></div>
+        <div class="ft-right">© 2024 DesignCheck SaaS <i class="fa-solid fa-star-of-life" style="color:#4a6568"></i></div>
+    </footer>
+
+    <!-- Firebase Modular SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, updateDoc, onSnapshot, getDoc, query, where, getDocs, orderBy, limit, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC7f4QH6CSRN6dAhGNm7P4kMHTv12mtdEo",
+            authDomain: "designcheck-8be9f.firebaseapp.com",
+            projectId: "designcheck-8be9f",
+            storageBucket: "designcheck-8be9f.firebasestorage.app",
+            messagingSenderId: "766391064183",
+            appId: "1:766391064183:web:36c6d4368196e3db2bd872",
+            measurementId: "G-R8PZGRMJKS"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.firebaseModular = { auth, db, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, collection, doc, setDoc, updateDoc, onSnapshot, getDoc, query, where, getDocs, orderBy, limit, addDoc, serverTimestamp };
+    </script>
+
+    <!-- Libraries for Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        // DOM Elements
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const canvasPlaceholder = document.getElementById('canvasPlaceholder');
+        const editorCanvas = document.getElementById('editorCanvas');
+        const resultsPanel = document.getElementById('resultsPanel');
+        const panelHeaderText = document.getElementById('panelHeaderText');
+        const overallScoreText = document.getElementById('overallScoreText');
+        const loginBtn = document.getElementById('loginBtn');
+        const authContainer = document.getElementById('authContainer');
+
+        let fCanvas = null;
+        let userState = {
+            loggedIn: false,
+            uid: null,
+            email: null,
+            photoURL: null,
+            isPremium: false,
+            isAdmin: false,
+            plan: 'free',
+            credits: 10
+        };
+
+        const ADMIN_EMAIL = "ibraheemashshuraim@gmail.com";
+        const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/test_dummy_link";
+        let unsubscribeCredits = null;
+
+        // Firebase Bridge (Wait for modular script to load)
+        const getFirebase = () => window.firebaseModular;
+
+        // ================ AUTH & USER STATE ================
+        function initAuth() {
+            const fb = getFirebase();
+            if (!fb) { setTimeout(initAuth, 100); return; }
+
+            fb.onAuthStateChanged(fb.auth, async (user) => {
+                if (user) {
+                    userState.loggedIn = true;
+                    userState.uid = user.uid;
+                    userState.email = user.email;
+                    userState.photoURL = user.photoURL;
+                    userState.isAdmin = (user.email === ADMIN_EMAIL);
+                    
+                    await loadUserData(user.uid);
+                    updateAuthUI(user);
+                } else {
+                    resetUserState();
+                    updateAuthUI(null);
+                }
+            });
+
+            loginBtn.addEventListener('click', async () => {
+                const provider = new fb.GoogleAuthProvider();
+                try {
+                    await fb.signInWithPopup(fb.auth, provider);
+                } catch (e) {
+                    console.error("Login Error:", e);
+                    alert("لاگ ان میں مسئلہ پیش آیا۔");
+                }
+            });
+        }
+
+        async function loadUserData(uid) {
+            const fb = getFirebase();
+            const userRef = fb.doc(fb.db, "users", uid);
+            
+            if (unsubscribeCredits) unsubscribeCredits();
+            
+            unsubscribeCredits = fb.onSnapshot(userRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    userState.credits = data.credits ?? 10;
+                    userState.isPremium = data.isPremium ?? userState.isAdmin;
+                    userState.plan = data.plan ?? (userState.isAdmin ? 'admin' : 'free');
+                    updateAuthUI(fb.auth.currentUser);
+                } else {
+                    fb.setDoc(userRef, {
+                        email: userState.email,
+                        credits: 10,
+                        isPremium: userState.isAdmin,
+                        plan: userState.isAdmin ? 'admin' : 'free',
+                        createdAt: fb.serverTimestamp()
+                    });
+                }
+            });
+        }
+
+        window.submitTID = async () => {
+            const tid = document.getElementById('tidInput').value.trim();
+            if (!tid) { alert("براہ کرم ٹرانزیکشن آئی ڈی (TID) درج کریں۔"); return; }
+            
+            const tidBtn = document.getElementById('tidSubmitBtn');
+            tidBtn.disabled = true;
+            tidBtn.innerText = "Processing...";
+
+            const fb = getFirebase();
+            try {
+                // Add TID request record
+                await fb.addDoc(fb.collection(fb.db, "payment_requests"), {
+                    uid: userState.uid,
+                    email: userState.email,
+                    tid: tid,
+                    status: "pending",
+                    amount: 500,
+                    creditsRequested: 100,
+                    timestamp: fb.serverTimestamp()
+                });
+
+                // Grant 5 trial credits instantly
+                const userRef = fb.doc(fb.db, "users", userState.uid);
+                await fb.updateDoc(userRef, {
+                    credits: userState.credits + 5
+                });
+
+                alert("شکریہ! آپ کا TID موصول ہو گیا ہے۔ 5 ٹرائل کریڈٹ آپ کے اکاؤنٹ میں شامل کر دیے گئے ہیں۔");
+                document.getElementById('upgradeModal').classList.add('hidden');
+                document.getElementById('tidInput').value = '';
+            } catch (e) {
+                console.error("TID Error:", e);
+                alert("TID جمع کرانے میں مسئلہ پیش آیا۔");
+            } finally {
+                tidBtn.disabled = false;
+                tidBtn.innerText = "Submit";
+            }
+        };
+
+        function resetUserState() {
+            userState = { loggedIn: false, uid: null, email: null, photoURL: null, isPremium: false, isAdmin: false, plan: 'free', credits: 10 };
+            if (unsubscribeCredits) unsubscribeCredits();
+        }
+
+        function updateAuthUI(user) {
+            if (!user) {
+                loginBtn.classList.remove('hidden');
+                document.getElementById('profileChip')?.remove();
+                document.getElementById('btnAdminNav').classList.add('hidden');
+                return;
+            }
+
+            loginBtn.classList.add('hidden');
+            
+            let chip = document.getElementById('profileChip');
+            if (!chip) {
+                chip = document.createElement('div');
+                chip.id = 'profileChip';
+                chip.className = 'profile-chip';
+                chip.onclick = (e) => {
+                    e.stopPropagation();
+                    document.getElementById('profileDropdown').classList.toggle('show');
+                };
+                authContainer.appendChild(chip);
+
+                const dropdown = document.createElement('div');
+                dropdown.id = 'profileDropdown';
+                dropdown.className = 'profile-dropdown';
+                chip.appendChild(dropdown);
+                
+                // Close dropdown on outside click
+                document.addEventListener('click', () => dropdown.classList.remove('show'));
+            }
+
+            const avatarHtml = userState.photoURL 
+                ? `<img src="${userState.photoURL}" alt="User">` 
+                : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:var(--neon-cyan); color:#000; font-weight:bold;">${user.email[0].toUpperCase()}</div>`;
+            
+            chip.innerHTML = `<div class="avatar">${avatarHtml}</div> <span style="font-size:0.85rem;">${user.displayName || user.email.split('@')[0]}</span>
+                <div id="profileDropdown" class="profile-dropdown">
+                    <div class="user-info-box">
+                        <span class="name">${user.displayName || 'User'}</span>
+                        <span class="email">${user.email}</span>
+                    </div>
+                    <div class="credits-indicator">
+                        <span>Available Credits</span>
+                        <span>${userState.credits}</span>
+                    </div>
+                    <button class="buy-credits-btn" onclick="openUpgradeModal(event)"><i class="fa-solid fa-cart-shopping"></i> Buy Credits</button>
+                    <div class="dropdown-menu-item" onclick="openHistory()"><i class="fa-solid fa-clock-rotate-left"></i> My History</div>
+                    <div class="dropdown-menu-item" onclick="openSettingsModal()"><i class="fa-solid fa-gear"></i> Settings</div>
+                    <div class="dropdown-menu-item" onclick="document.getElementById('apiSettingsModal').classList.remove('hidden')"><i class="fa-solid fa-key"></i> API Keys</div>
+                    ${userState.isAdmin ? `<div class="dropdown-menu-item" onclick="openAdminModal()" style="color:var(--warning-orange);"><i class="fa-solid fa-shield-halved"></i> Admin Panel</div>` : ''}
+                    <div class="dropdown-menu-item logout" onclick="signOutUser()"><i class="fa-solid fa-right-from-bracket"></i> Logout</div>
+                </div>`;
+            
+            // Update Modals if they are open
+            document.getElementById('profileEmail').innerText = user.email;
+            document.getElementById('profileCreditsDisplay').innerText = `${userState.credits} Credits`;
+            document.getElementById('profilePlan').innerText = userState.plan.toUpperCase();
+            document.getElementById('profileAvatar').innerHTML = avatarHtml;
+        }
+
+        window.openUpgradeModal = (e) => {
+            if (e) e.stopPropagation();
+            document.getElementById('upgradeModal').classList.remove('hidden');
+        };
+
+        window.signOutUser = () => {
+            const fb = getFirebase();
+            fb.signOut(fb.auth).then(() => {
+                document.getElementById('profileModal').classList.add('hidden');
+            });
+        };
+
+        // ================ EDITOR LOGIC (Fabric.js) ================
+        function initEditor(imgSrc, width, height) {
+            canvasPlaceholder.classList.add('hidden');
+            editorCanvas.classList.remove('hidden');
+
+            if (fCanvas) fCanvas.dispose();
+
+            fCanvas = new fabric.Canvas('editorCanvas', {
+                width: width,
+                height: height,
+                backgroundColor: '#000'
+            });
+
+            fabric.Image.fromURL(imgSrc, (img) => {
+                img.set({ selectable: false, evented: false });
+                img.scaleToWidth(width);
+                fCanvas.add(img);
+                fCanvas.sendToBack(img);
+                fCanvas.renderAll();
+            });
+
+            // Handle Selection
+            fCanvas.on('selection:created', updateToolSelection);
+            fCanvas.on('selection:updated', updateToolSelection);
+            fCanvas.on('selection:cleared', updateToolSelection);
+        }
+
+        function updateToolSelection() {
+            if (!fCanvas) return;
+            const active = fCanvas.getActiveObject();
+            if (active) {
+                // Future: show property panel for the object
+            }
+        }
+
+        window.setEditorTool = (tool) => {
+            document.querySelectorAll('.sidebar-tool-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tool${tool.charAt(0).toUpperCase() + tool.slice(1)}`)?.classList.add('active');
+            
+            if (tool === 'select') {
+                fCanvas.isDrawingMode = false;
+            }
+        };
+
+        window.addEditorText = () => {
+            if (!fCanvas) return;
+            const text = new fabric.IText('Edit Me', {
+                left: 100, top: 100,
+                fontFamily: 'Outfit',
+                fill: '#ffffff',
+                fontSize: 30
+            });
+            fCanvas.add(text);
+            fCanvas.setActiveObject(text);
+        };
+
+        window.toggleShapeMenu = () => {
+            // Simplified for now: just add a rectangle
+            if (!fCanvas) return;
+            const rect = new fabric.Rect({
+                left: 100, top: 100,
+                fill: 'rgba(0, 240, 255, 0.3)',
+                width: 150, height: 100,
+                stroke: 'var(--neon-cyan)',
+                strokeWidth: 2
+            });
+            fCanvas.add(rect);
+            fCanvas.setActiveObject(rect);
+        };
+
+        window.deleteSelectedObject = () => {
+            const active = fCanvas.getActiveObjects();
+            if (active.length) {
+                active.forEach(obj => fCanvas.remove(obj));
+                fCanvas.discardActiveObject();
+                fCanvas.renderAll();
+            }
+        };
+
+        window.removeBackground = () => {
+            alert("Background removal logic integration in progress...");
+        };
+
+        // ================ FILE HANDLING ================
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) handleFile(file);
+        });
+
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--neon-cyan)'; });
+        dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = ''; });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '';
+            const file = e.dataTransfer.files[0];
+            if (file) handleFile(file);
+        });
+
+        function handleFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const maxWidth = dropZone.clientWidth - 80;
+                    const maxHeight = dropZone.clientHeight - 80;
+                    let w = img.width, h = img.height;
+                    const ratio = Math.min(maxWidth / w, maxHeight / h, 1);
+                    initEditor(e.target.result, w * ratio, h * ratio);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // ================ AI ANALYSIS (Gemini) ================
+        window.runFullAudit = async () => {
+            if (!fCanvas) { alert("براہ کرم پہلے ڈیزائن اپلوڈ کریں۔"); return; }
+            if (userState.credits < 0.5 && !userState.isPremium) {
+                document.getElementById('upgradeModal').classList.remove('hidden');
+                return;
+            }
+
+            const apiKey = localStorage.getItem('geminiApiKey');
+            if (!apiKey) {
+                document.getElementById('apiSettingsModal').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+            const base64Image = fCanvas.toDataURL({ format: 'jpeg', quality: 0.8 }).split(',')[1];
+            const lang = document.getElementById('outputLangSelect').value;
+
+            const prompt = `Critique this graphic design. Output strictly in JSON format. 
+            Analyze accessibility (readability, font sizes) and color contrast. 
+            Language: ${lang}.
+            JSON Structure: 
+            {
+              "score": 85,
+              "accessibility": "Detailed feedback on accessibility...",
+              "contrast": "Detailed feedback on color contrast...",
+              "strengths": ["Item 1", "Item 2"],
+              "weaknesses": ["Item 1", "Item 2"],
+              "advice": "General advice..."
+            }`;
+
+            try {
+                if (apiKey === 'mock') {
+                    setTimeout(() => handleAnalysisResult({
+                        score: 92,
+                        accessibility: "فونٹس اور تمام عناصر واضح ہیں، پڑھنے میں آسانی ہے۔",
+                        contrast: "رنگوں کا انتخاب بہترین ہے، کنٹراسٹ ریشو موزوں ہے۔",
+                        strengths: ["عمدہ رنگ", "واضح فونٹس"],
+                        weaknesses: ["کوئی خاص مسئلہ نہیں"],
+                        advice: "ڈیزائن تیار ہے، استعمال کیا جا سکتا ہے۔"
+                    }), 2000);
+                    return;
+                }
+
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: "image/jpeg", data: base64Image } }] }] })
+                });
+
+                const data = await response.json();
+                const text = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
+                handleAnalysisResult(JSON.parse(text));
+            } catch (e) {
+                console.error(e);
+                alert("تجزیہ کے دوران خرابی پیش آئی۔");
+                document.getElementById('loadingOverlay').classList.add('hidden');
+            }
+        };
+
+        async function handleAnalysisResult(result) {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+            overallScoreText.innerText = result.score;
+            document.getElementById('accessOut').innerText = result.accessibility;
+            document.getElementById('contrastOut').innerText = result.contrast;
+            
+            document.getElementById('reportGoodOut').innerHTML = result.strengths.map(s => `<span class="chip chip-success">${s}</span>`).join('');
+            document.getElementById('reportBadOut').innerHTML = result.weaknesses.map(w => `<span class="chip chip-warning">${w}</span>`).join('');
+            
+            // Update Credits
+            if (!userState.isPremium) {
+                const fb = getFirebase();
+                const userRef = fb.doc(fb.db, "users", userState.uid);
+                await fb.updateDoc(userRef, { credits: userState.credits - 0.5 });
+            }
+        }
+
+        // ================ MODALS & UTILS ================
+        window.openAdminModal = async () => {
+            document.getElementById('adminModal').classList.remove('hidden');
+            const fb = getFirebase();
+            
+            // Load Users
+            const userQ = fb.query(fb.collection(fb.db, "users"), fb.orderBy("createdAt", "desc"), fb.limit(20));
+            const userSnapshot = await fb.getDocs(userQ);
+            const userBody = document.getElementById('adminUserListBody');
+            userBody.innerHTML = '';
+            userSnapshot.forEach(doc => {
+                const u = doc.data();
+                const joined = u.createdAt?.toDate ? u.createdAt.toDate().toLocaleDateString() : 'N/A';
+                userBody.innerHTML += `<tr>
+                    <td>${u.email}</td>
+                    <td>${u.credits}</td>
+                    <td>${u.plan}</td>
+                    <td>${joined}</td>
+                    <td><button class="action-btn block-btn">Block</button></td>
+                </tr>`;
+            });
+
+            // Load Payment Requests
+            const payQ = fb.query(fb.collection(fb.db, "payment_requests"), fb.orderBy("timestamp", "desc"), fb.limit(20));
+            const paySnapshot = await fb.getDocs(payQ);
+            const payBody = document.getElementById('paymentRequestsBody');
+            payBody.innerHTML = '';
+            if (paySnapshot.empty) {
+                payBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No requests found.</td></tr>';
+            }
+            paySnapshot.forEach(doc => {
+                const p = doc.data();
+                const time = p.timestamp?.toDate ? p.timestamp.toDate().toLocaleString() : 'N/A';
+                payBody.innerHTML += `<tr>
+                    <td>${p.email}</td>
+                    <td><span style="font-family:monospace; color:var(--neon-cyan); cursor:copy;" title="Click to copy">${p.tid}</span></td>
+                    <td>Rs. ${p.amount}</td>
+                    <td><span style="color:${p.status === 'pending' ? 'var(--warning-orange)' : 'var(--success-green)'}">${p.status.toUpperCase()}</span></td>
+                    <td>${time}</td>
+                </tr>`;
+            });
+        };
+
+        window.openSettingsModal = () => document.getElementById('settingsModal').classList.remove('hidden');
+        window.saveApiKey = () => {
+            const val = document.getElementById('apiKeyInput').value.trim();
+            if (val) {
+                localStorage.setItem('geminiApiKey', val);
+                document.getElementById('apiSettingsModal').classList.add('hidden');
+            }
+        };
+
+        // ACCESSIBILITY
+        document.getElementById('fontSizeSlider').oninput = (e) => {
+            document.documentElement.style.fontSize = `${e.target.value}%`;
+            document.getElementById('fontSizeDisplay').innerText = `${e.target.value}%`;
+        };
+        document.getElementById('fontFamilySelect').onchange = (e) => {
+            document.body.style.fontFamily = e.target.value;
+        };
+
+        // EXPORTS
+        window.exportPDF = () => {
+            const { jsPDF } = window.jspdf;
+            html2canvas(document.getElementById('resultsPanel')).then(canvas => {
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 210, 297);
+                pdf.save("DesignCheck-Report.pdf");
+            });
+        };
+
+        initAuth();
+    </script>
+</body>
+</html>
