@@ -76,11 +76,14 @@
 
         /* Dashboard Layout */
         .dashboard-main {
-            padding: 20px 50px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px 40px;
             height: calc(100vh - 70px - 44px);
             display: flex;
             flex-direction: column;
             gap: 20px;
+            width: 100%;
         }
 
         .dashboard-header {
@@ -88,13 +91,14 @@
         }
 
         .dashboard-header h1 {
-            font-size: 2.8rem;
-            background: linear-gradient(135deg, #fff 30%, var(--neon-cyan) 100%);
+            font-size: 3rem;
+            background: linear-gradient(135deg, #fff 40%, var(--neon-cyan) 100%);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-weight: 800;
-            letter-spacing: -1px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
         }
 
         .dashboard-header p {
@@ -107,27 +111,34 @@
 
         .cards-container {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr 1fr;
             gap: 40px;
             flex: 1;
             min-height: 0;
-            padding: 0 80px 20px;
-            max-width: 1600px;
-            margin: 0 auto;
-            width: 100%;
+            padding: 0 20px 20px;
         }
 
         .dash-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-dim);
-            border-radius: 32px;
-            backdrop-filter: blur(40px) saturate(180%);
+            background: rgba(13, 22, 38, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 36px;
+            backdrop-filter: blur(50px) saturate(220%);
             display: flex;
             flex-direction: column;
             overflow: hidden;
             position: relative;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.5);
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            box-shadow: 
+                0 0 0 1px rgba(255,255,255,0.03) inset,
+                0 20px 60px rgba(0,0,0,0.6);
+            transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .dash-card:hover { 
+            background: rgba(13, 22, 38, 0.5);
+            border-color: rgba(0, 229, 255, 0.3); 
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 
+                0 0 0 1px rgba(0,229,255,0.1) inset,
+                0 30px 80px rgba(0,229,255,0.1);
         }
         .dash-card::after {
             content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
@@ -158,13 +169,13 @@
 
         .card-content {
             flex: 1;
-            padding: 25px;
+            padding: 30px;
             overflow-y: auto;
             scrollbar-width: thin;
-            scrollbar-color: var(--border-dim) transparent;
+            scrollbar-color: rgba(255,255,255,0.05) transparent;
         }
-        .card-content::-webkit-scrollbar { width: 6px; }
-        .card-content::-webkit-scrollbar-thumb { background: var(--border-dim); border-radius: 10px; }
+        .card-content::-webkit-scrollbar { width: 5px; }
+        .card-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
 
         /* Workspace Logic */
         .workspace-preview {
@@ -189,38 +200,48 @@
 
         /* Analysis Premium */
         .score-orb {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
+            width: 160px; height: 160px; border-radius: 50%; margin: 0 auto 30px;
             background: conic-gradient(from 0deg, var(--neon-cyan), var(--neon-purple), var(--neon-cyan));
-            margin: 0 auto 20px;
-            padding: 4px;
-            position: relative;
-            animation: rotate-orb 10s linear infinite;
+            padding: 2px; position: relative; animation: orb-rotate 10s linear infinite;
         }
-        @keyframes rotate-orb { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes orb-rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         
         .score-inner {
             width: 100%; height: 100%; background: #030a16; border-radius: 50%;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transform: rotate(-360deg); /* Counter-rotate to keep text upright */
-            animation: counter-rotate-orb 10s linear infinite;
+            animation: orb-counter-rotate 10s linear infinite;
         }
-        @keyframes counter-rotate-orb { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+        @keyframes orb-counter-rotate { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
 
         .result-item {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border-dim);
-            border-radius: 16px;
-            padding: 18px;
-            margin-bottom: 20px;
-            transition: 0.3s;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            overflow: hidden;
         }
-        .result-item:hover { background: rgba(255, 255, 255, 0.04); border-color: rgba(0, 229, 255, 0.2); }
+        .result-item:hover { 
+            background: rgba(255, 255, 255, 0.05); 
+            border-color: rgba(0, 229, 255, 0.2);
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .result-item::before {
+            content: ''; position: absolute; left: 0; top: 0; width: 4px; height: 100%;
+            background: var(--neon-cyan); opacity: 0.5;
+        }
 
-        .chip { display: inline-block; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; margin: 4px; font-weight: 600; }
-        .chip-success { background: rgba(0, 255, 157, 0.1); color: var(--success-green); border: 1px solid rgba(0, 255, 157, 0.2); }
-        .chip-warning { background: rgba(255, 179, 0, 0.1); color: var(--warning-orange); border: 1px solid rgba(255, 179, 0, 0.2); }
+        .chip { 
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 6px 14px; border-radius: 10px; font-size: 0.75rem; 
+            margin: 4px; font-weight: 700; letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .chip-success { background: rgba(0, 255, 157, 0.08); color: var(--success-green); border: 1px solid rgba(0, 255, 157, 0.15); }
+        .chip-warning { background: rgba(255, 179, 0, 0.08); color: var(--warning-orange); border: 1px solid rgba(255, 179, 0, 0.15); }
 
         /* Buttons Premium */
         .btn {
