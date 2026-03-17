@@ -722,14 +722,6 @@
         </div>
     </div>
 
-    <div id="loadingOverlay" class="modal hidden" style="z-index: 2000;">
-        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
-            <div class="spinner"></div>
-            <h2 style="color:var(--neon-cyan); font-family:'Outfit'; margin-top:20px;">AI Scanning...</h2>
-            <p style="color:var(--text-muted);">Analyzing layout & extracting color palette.</p>
-        </div>
-    </div>
-
     <footer>
         <div class="ft-left">Powered by <strong style="color: #00f0ff;">Gemini AI</strong></div>
         <div class="ft-right">© 2024 DesignCheck SaaS <i class="fa-solid fa-star-of-life" style="color:#4a6568"></i></div>
@@ -1023,13 +1015,21 @@
         // ================ AI ANALYSIS ================
         window.runFullAudit = async () => {
             if (!currentImageBase64) { alert("براہ کرم پہلے ڈیزائن اپلوڈ کریں۔"); return; }
+            
+            // Catch: If library not loaded, wait 2s and retry
+            if (!window.GoogleGenerativeAIConstructor) {
+                console.log("AI Library (genAI) not loaded yet. Retrying in 2s...");
+                setTimeout(window.runFullAudit, 2000);
+                return;
+            }
+
             if (userState.credits < 0.5 && !userState.isPremium) {
                 openUpgradeModal();
                 return;
             }
 
             const userApiKey = localStorage.getItem('geminiApiKey');
-            const defaultApiKey = "AIzaSyC7f4QH6CSRN6dAhGNm7P4kMHTv12mtdEo"; // FALLBACK KEY AS REQUESTED BY USER
+            const defaultApiKey = "AIzaSyC7f4QH6CSRN6dAhGNm7P4kMHTv12mtdEo"; 
             const apiKey = userApiKey || defaultApiKey;
             
             document.getElementById('scanningModal').classList.remove('hidden');
@@ -1050,13 +1050,9 @@
             }`;
 
             try {
-                // ULTIMATE STABILITY FIX: Strictly using gemini-1.5-flash
-                // Attempting v1beta first as it's often more compatible with newest models
                 const genAI = new window.GoogleGenerativeAIConstructor(apiKey);
-                const model = genAI.getGenerativeModel(
-                    { model: "gemini-1.5-flash" },
-                    { apiVersion: "v1" }
-                );
+                // Simplified master fix for both v1 and v1beta stability
+                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
                 const result = await model.generateContent([
                     prompt,
@@ -1215,7 +1211,6 @@
         };
 
         window.saveApiKeyFromModal = () => window.saveApiKey('apiKeyInput');
-        window.saveApiKeyFromDropdown = () => window.saveApiKey('dropdownApiKeyInput');
 
         document.getElementById('fontSizeSlider').oninput = (e) => {
             document.documentElement.style.fontSize = `${e.target.value}%`;
