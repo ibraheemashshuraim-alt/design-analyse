@@ -60,7 +60,7 @@
             font-family: 'Outfit', sans-serif; color: #fff; direction: ltr;
             text-decoration: none;
         }
-        .brand-logo::after { content: 'v5.1'; font-size: 0.6rem; color: var(--neon-cyan); margin-left:10px; opacity: 0.6; }
+        .brand-logo::after { content: 'v5.2'; font-size: 0.6rem; color: var(--neon-cyan); margin-left:10px; opacity: 0.6; }
 
         .logo-icon {
             width: 34px; height: 34px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
@@ -902,10 +902,10 @@
                 <div class="avatar" style="background:#fff; border: 2.5px solid var(--neon-cyan); scale: 1.1;">${avatarImg}</div> 
                 <span style="font-size:1rem; font-weight:800; color:#fff; letter-spacing:0.5px; text-shadow:0 0 10px rgba(0,229,255,0.3);">${user.displayName || user.email.split('@')[0]}</span>
                 
-                <div id="profileDropdown" class="profile-dropdown">
+                <div id="profileDropdown" class="profile-dropdown" onclick="event.stopPropagation()">
                     <div class="dropdown-user-header">
                         <div class="user-name-fancy">${user.displayName || 'Design Enthusiast'}</div>
-                        <div class="user-email-box">${user.email}</div>
+                        <div class="user-email-box" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${user.email}</div>
                     </div>
 
                     <div class="stat-grid-premium">
@@ -1027,7 +1027,7 @@
             }`;
 
             try {
-                // ULTIMATE RESILIENCE FIX: Strictly using gemini-1.5-flash as requested
+                // ULTIMATE STABILITY FIX: Strictly using gemini-1.5-flash with v1 fallback/check
                 const genAI = new window.GoogleGenerativeAIConstructor(apiKey);
                 const model = genAI.getGenerativeModel(
                     { model: "gemini-1.5-flash" },
