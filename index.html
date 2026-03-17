@@ -60,7 +60,7 @@
             font-family: 'Outfit', sans-serif; color: #fff; direction: ltr;
             text-decoration: none;
         }
-        .brand-logo::after { content: 'v5.0'; font-size: 0.6rem; color: var(--neon-cyan); margin-left:10px; opacity: 0.6; }
+        .brand-logo::after { content: 'v5.1'; font-size: 0.6rem; color: var(--neon-cyan); margin-left:10px; opacity: 0.6; }
 
         .logo-icon {
             width: 34px; height: 34px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
@@ -633,19 +633,6 @@
         </div>
     </div>
 
-    <div id="apiSettingsModal" class="modal hidden">
-        <div class="modal-content" style="max-width: 450px;">
-            <span class="close-btn" onclick="document.getElementById('apiSettingsModal').classList.add('hidden')">&times;</span>
-            <h2 style="color:var(--neon-cyan); margin-bottom:15px;"><i class="fa-solid fa-key"></i> API Configuration</h2>
-            <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:20px;">Gemini API Key ڈالیں تاکہ AI تجزیہ کیا جا سکے۔</p>
-            <input type="password" id="apiKeyInput" placeholder="Sk-..." style="width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--border-dim); color:white; padding:12px; border-radius:8px; margin-bottom:15px; font-family:monospace;">
-            <div style="display:flex; gap:10px;">
-                <button class="btn browse-btn" id="saveApiKeyBtn" onclick="saveApiKey()" style="flex:1;">Save Key</button>
-                <button class="btn outline-btn hidden" id="editApiKeyBtn" onclick="editApiKey()" style="flex:0.5;">Edit</button>
-            </div>
-            <p id="apiHintText" style="margin-top:10px; font-size:0.8rem; color:var(--text-muted); text-align:center;"></p>
-        </div>
-    </div>
 
     <div id="upgradeModal" class="modal hidden">
         <div class="modal-content" style="max-width: 480px;">
@@ -668,39 +655,14 @@
             <div style="text-align:left;">
                 <label style="color:var(--text-muted); font-size:0.8rem; display:block; margin-bottom:8px;">Submit Transaction ID (TID)</label>
                 <div style="display:flex; gap:10px;">
-                    <input type="text" id="tidInput" placeholder="Enter TID (e.g. 12345678)" style="flex:1; background:rgba(0,0,0,0.3); border:1px solid var(--border-dim); color:white; padding:12px; border-radius:10px; outline:none; transition:0.3s;" onfocus="this.style.borderColor='var(--neon-cyan)'">
-                    <button class="btn browse-btn" onclick="submitTID()" id="tidSubmitBtn" style="padding:0 25px;">Submit</button>
+                    <input type="text" id="upgradeTidInput" placeholder="Enter TID (e.g. 12345678)" style="flex:1; background:rgba(0,0,0,0.3); border:1px solid var(--border-dim); color:white; padding:12px; border-radius:10px; outline:none; transition:0.3s;" onfocus="this.style.borderColor='var(--neon-cyan)'">
+                    <button class="btn browse-btn" onclick="submitTID('upgradeTidInput')" id="tidSubmitBtn" style="padding:0 25px;">Submit</button>
                 </div>
                 <p style="font-size:0.75rem; color:var(--text-muted); margin-top:10px; text-align:center;">TID جمع کرانے پر آپ کو فوری طور پر 5 ٹرائل کریڈٹ مل جائیں گے۔</p>
             </div>
         </div>
     </div>
 
-    <div id="profileModal" class="modal hidden">
-        <div class="modal-content" style="max-width: 500px; text-align:center;">
-            <span class="close-btn" onclick="document.getElementById('profileModal').classList.add('hidden')">&times;</span>
-            <div id="profileAvatar" style="width:80px; height:80px; border-radius:50%; background:var(--neon-cyan); margin:0 auto 15px; display:flex; align-items:center; justify-content:center; font-size:2rem; font-weight:700; color:#000; overflow:hidden;">U</div>
-            <h3 id="profileEmail" style="color:white; margin-bottom:5px;">user@example.com</h3>
-            <div style="display:flex; justify-content:center; gap:10px; margin-bottom:20px;">
-                <span id="profilePlan" style="background:rgba(0,240,255,0.1); border:1px solid var(--neon-cyan); color:var(--neon-cyan); padding:4px 12px; border-radius:15px; font-size:0.8rem;">Free Plan</span>
-                <span id="profileCreditsDisplay" style="background:rgba(255,255,255,0.05); border:1px solid var(--text-muted); color:var(--text-muted); padding:4px 12px; border-radius:15px; font-size:0.8rem;">10 Credits</span>
-            </div>
-            
-            <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-dim); border-radius:12px; padding:15px; margin-bottom:20px; text-align:left;">
-                <label style="color:var(--text-muted); font-size:0.8rem;">Add Credits (Rs. 500 for 100 Credits)</label>
-                <div style="display:flex; gap:10px; margin-top:10px;">
-                    <input type="text" id="tidInput" placeholder="Transaction ID (TID)" style="flex:1; background:rgba(0,0,0,0.3); border:1px solid var(--border-dim); color:white; padding:10px; border-radius:8px;">
-                    <button class="btn browse-btn" onclick="submitTID()" style="padding:10px 15px;">Submit</button>
-                </div>
-                <p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">5 Credits will be added instantly.</p>
-            </div>
-
-            <button class="btn outline-btn" id="profileLogoutBtn" style="width:100%; border-color:#ff5252; color:#ff5252;" onclick="signOutUser()">Logout</button>
-            <div style="margin-top:15px;">
-                <button class="btn nav-btn" id="profileHistoryBtn" onclick="openHistory()" style="margin:0 auto;"><i class="fa-solid fa-clock-rotate-left"></i> View History</button>
-            </div>
-        </div>
-    </div>
 
     <!-- AI Scanning Modal -->
     <div id="scanningModal" class="modal hidden">
@@ -709,7 +671,8 @@
             <div class="scan-text">AI SCANNING...</div>
             <p style="color: var(--text-muted); font-size: 0.9rem; font-family: 'Noto Nastaliq Urdu';">ڈیزائن کا گہرائی سے جائزہ لیا جا رہا ہے</p>
         </div>
-    </div>
+    <!-- Design History Modal -->
+    <div id="historyModal" class="modal hidden">
         <div class="modal-content" style="max-width: 900px; height: 80vh;">
             <span class="close-btn" onclick="document.getElementById('historyModal').classList.add('hidden')">&times;</span>
             <h2 style="color:var(--neon-cyan); margin-bottom:20px;"><i class="fa-solid fa-clock-rotate-left"></i> Design History</h2>
@@ -875,8 +838,9 @@
             });
         }
 
-        window.submitTID = async () => {
-            const tid = document.getElementById('tidInput').value.trim();
+        window.submitTID = async (inputId = 'upgradeTidInput') => {
+            const input = document.getElementById(inputId);
+            const tid = input?.value.trim();
             if (!tid) { alert("براہ کرم ٹرانزیکشن آئی ڈی (TID) درج کریں۔"); return; }
             
             const fb = getFirebase();
@@ -896,9 +860,10 @@
 
                 alert("شکریہ! آپ کا TID موصول ہو گیا ہے۔ 5 ٹرائل کریڈٹ آپ کے اکاؤنٹ میں شامل کر دیے گئے ہیں۔");
                 document.getElementById('upgradeModal').classList.add('hidden');
-                document.getElementById('tidInput').value = '';
+                if (input) input.value = '';
             } catch (e) {
                 console.error("TID Error:", e);
+                alert("Error submitting TID.");
             }
         };
 
@@ -1062,10 +1027,10 @@
             }`;
 
             try {
-                // ULTIMATE 8B FIX: Strictly using gemini-1.5-flash-8b as requested
+                // ULTIMATE RESILIENCE FIX: Strictly using gemini-1.5-flash as requested
                 const genAI = new window.GoogleGenerativeAIConstructor(apiKey);
                 const model = genAI.getGenerativeModel(
-                    { model: "gemini-1.5-flash-8b" },
+                    { model: "gemini-1.5-flash" },
                     { apiVersion: "v1" }
                 );
 
@@ -1205,50 +1170,28 @@
             document.getElementById('apiKeyInput').value = savedApiKey;
         };
         
-        window.saveApiKeyFromModal = () => {
-            const input = document.getElementById('apiKeyInput');
-            const val = input.value.trim();
+        window.saveApiKey = (id = 'apiKeyInput') => {
+            const input = document.getElementById(id);
+            const val = input?.value.trim();
             if (val) {
                 localStorage.setItem('geminiApiKey', val);
                 const msg = document.getElementById('saveStatusMsg');
-                msg.style.display = 'block';
-                setTimeout(() => {
-                    msg.style.display = 'none';
+                if (msg) {
+                    msg.style.display = 'block';
+                    setTimeout(() => {
+                        msg.style.display = 'none';
+                        document.getElementById('apiSettingsModal').classList.add('hidden');
+                    }, 1500);
+                } else {
                     document.getElementById('apiSettingsModal').classList.add('hidden');
-                }, 1500);
-            } else {
-                alert("Please enter a valid API key.");
-            }
-        };
-
-        window.openSettingsModal = (e) => {
-            if (e) e.stopPropagation();
-            document.getElementById('settingsModal').classList.remove('hidden');
-        };
-        
-        window.saveApiKeyFromDropdown = () => {
-            const input = document.getElementById('dropdownApiKeyInput');
-            const val = input.value.trim();
-            if (val) {
-                localStorage.setItem('geminiApiKey', val);
-                const msg = document.getElementById('saveConfirmMsg');
-                msg.style.display = 'block';
-                setTimeout(() => msg.style.display = 'none', 3000);
+                }
             } else {
                 alert("براہ کرم API Key درج کریں۔");
             }
         };
 
-        window.saveApiKey = () => {
-            const val = document.getElementById('apiKeyInput').value.trim();
-            if (val) {
-                localStorage.setItem('geminiApiKey', val);
-                document.getElementById('apiSettingsModal').classList.add('hidden');
-                // Sync with dropdown input if it exists
-                const dropdownInput = document.getElementById('dropdownApiKeyInput');
-                if (dropdownInput) dropdownInput.value = val;
-            }
-        };
+        window.saveApiKeyFromModal = () => window.saveApiKey('apiKeyInput');
+        window.saveApiKeyFromDropdown = () => window.saveApiKey('dropdownApiKeyInput');
 
         document.getElementById('fontSizeSlider').oninput = (e) => {
             document.documentElement.style.fontSize = `${e.target.value}%`;
