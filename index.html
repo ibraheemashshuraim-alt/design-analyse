@@ -60,7 +60,7 @@
             font-family: 'Outfit', sans-serif; color: #fff; direction: ltr;
             text-decoration: none;
         }
-        .brand-logo::after { content: 'v4.8'; font-size: 0.6rem; color: var(--neon-cyan); margin-left:10px; opacity: 0.6; }
+        .brand-logo::after { content: 'v4.9' ; font-size: 0.6rem; color: var(--neon-cyan); margin-left:10px; opacity: 0.6; }
 
         .logo-icon {
             width: 34px; height: 34px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
@@ -1037,9 +1037,13 @@
             }`;
 
             try {
-                // OFFICIAL SDK IMPLEMENTATION
+                // STABILITY FIX: Forcing 'v1' instead of 'v1beta' as requested by user
+                // because gemini-1.5-flash is often not found on v1beta in some regions.
                 const genAI = new window.GoogleGenerativeAIConstructor(apiKey);
-                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                const model = genAI.getGenerativeModel(
+                    { model: "gemini-1.5-flash" },
+                    { apiVersion: "v1" } // Forced stable version
+                );
 
                 const result = await model.generateContent([
                     prompt,
