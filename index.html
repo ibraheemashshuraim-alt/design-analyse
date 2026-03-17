@@ -265,7 +265,7 @@
             width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); 
             overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.4); 
             display: flex; align-items: center; justify-content: center;
-            background: #ffffff; color: #1a1a1a;
+            background: #ffffff !important; color: #1a1a1a;
             font-family: 'Inter', sans-serif;
             font-weight: 700;
         }
@@ -373,6 +373,56 @@
             .analysis-panel { position: fixed; right: -340px; top: 60px; height: calc(100vh - 60px); width: 340px; transition: 0.3s; z-index: 100; }
             .analysis-panel.show { right: 0; }
         }
+        /* Scanning Modal Fancy */
+        #scanningModal .modal-content {
+            background: rgba(8, 14, 25, 0.95);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 40px;
+            padding: 60px;
+            text-align: center;
+            max-width: 480px;
+            box-shadow: 0 0 150px rgba(0, 229, 255, 0.1), 0 0 50px rgba(157, 0, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+        }
+
+        .scan-loader {
+            width: 140px; height: 140px;
+            border: 2px solid rgba(0, 229, 255, 0.05);
+            border-top: 3px solid var(--neon-cyan);
+            border-radius: 50%;
+            margin: 0 auto 35px;
+            animation: spin-glow 1.2s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite;
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .scan-loader::after {
+            content: 'AI'; color: var(--neon-cyan); font-weight: 900; font-size: 1.5rem;
+            text-shadow: 0 0 10px var(--neon-cyan);
+            animation: pulse-ai 1.5s ease-in-out infinite;
+            position: absolute;
+        }
+        @keyframes pulse-ai { 0%, 100% { opacity: 0.5; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.1); } }
+        @keyframes spin-glow { 
+            0% { transform: rotate(0deg); box-shadow: 0 0 20px rgba(0, 229, 255, 0.2); }
+            50% { box-shadow: 0 0 40px rgba(0, 229, 255, 0.5); }
+            100% { transform: rotate(360deg); box-shadow: 0 0 20px rgba(0, 229, 255, 0.2); }
+        }
+        @keyframes spin-glow-reverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+
+        .scan-text {
+            font-size: 1.4rem; font-weight: 800; color: #fff;
+            letter-spacing: 2px; text-transform: uppercase;
+            margin-bottom: 10px;
+            animation: pulse-text 2s infinite;
+        }
+        @keyframes pulse-text { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+        /* General Premium Tweaks */
+        .dash-card { border-radius: 40px; }
+        .dashboard-header h1 { font-weight: 200; letter-spacing: 12px; }
+        .top-nav { height: 80px; padding: 0 80px; }
     </style>
 </head>
 
@@ -640,7 +690,14 @@
         </div>
     </div>
 
-    <div id="historyModal" class="modal hidden">
+    <!-- AI Scanning Modal -->
+    <div id="scanningModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="scan-loader"></div>
+            <div class="scan-text">AI SCANNING...</div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; font-family: 'Noto Nastaliq Urdu';">ڈیزائن کا گہرائی سے جائزہ لیا جا رہا ہے</p>
+        </div>
+    </div>
         <div class="modal-content" style="max-width: 900px; height: 80vh;">
             <span class="close-btn" onclick="document.getElementById('historyModal').classList.add('hidden')">&times;</span>
             <h2 style="color:var(--neon-cyan); margin-bottom:20px;"><i class="fa-solid fa-clock-rotate-left"></i> Design History</h2>
@@ -927,6 +984,9 @@
                 designPreview.classList.remove('hidden');
                 canvasPlaceholder.classList.add('hidden');
                 workspaceActions.classList.remove('hidden');
+                
+                // Auto-trigger scan
+                runFullAudit();
             };
             reader.readAsDataURL(file);
         }
@@ -945,7 +1005,7 @@
                 return;
             }
 
-            document.getElementById('loadingOverlay').classList.remove('hidden');
+            document.getElementById('scanningModal').classList.remove('hidden');
             const base64Data = currentImageBase64.split(',')[1];
             const lang = document.getElementById('outputLangSelect').value;
 
@@ -972,17 +1032,23 @@
                 const data = await response.json();
                 if (data.error) throw new Error(data.error.message);
                 
-                const text = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
-                handleAnalysisResult(JSON.parse(text));
+                let text = data.candidates[0].content.parts[0].text;
+                // Robust JSON extraction
+                const jsonMatch = text.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    handleAnalysisResult(JSON.parse(jsonMatch[0]));
+                } else {
+                    throw new Error("Invalid response format from AI");
+                }
             } catch (e) {
                 console.error(e);
                 alert("تجزیہ کے دوران خرابی پیش آئی: " + e.message);
-                document.getElementById('loadingOverlay').classList.add('hidden');
+                document.getElementById('scanningModal').classList.add('hidden');
             }
         };
 
         async function handleAnalysisResult(result) {
-            document.getElementById('loadingOverlay').classList.add('hidden');
+            document.getElementById('scanningModal').classList.add('hidden');
             document.getElementById('initialAnalysisMsg').classList.add('hidden');
             document.getElementById('analysisResults').classList.remove('hidden');
             panelHeaderText.innerText = "ANALYSIS COMPLETE";
