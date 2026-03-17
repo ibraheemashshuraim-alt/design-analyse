@@ -60,7 +60,7 @@
             font-family: 'Outfit', sans-serif; color: #fff; direction: ltr;
             text-decoration: none;
         }
-        .brand-logo::after { content: 'v4.6'; font-size: 0.6rem; color: var(--neon-cyan); margin-left:10px; opacity: 0.6; }
+        .brand-logo::after { content: 'v4.7'; font-size: 0.6rem; color: var(--neon-cyan); margin-left:10px; opacity: 0.6; }
 
         .logo-icon {
             width: 34px; height: 34px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
@@ -272,41 +272,48 @@
         }
 
         .profile-dropdown {
-            position: absolute; top: calc(100% + 15px); inset-inline-start: 0; width: 260px;
-            max-height: 400px; overflow-y: auto;
-            background: rgba(8, 14, 25, 0.8); backdrop-filter: blur(50px) saturate(210%);
-            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px;
-            padding: 18px; box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 229, 255, 0.08);
-            display: none; flex-direction: column; gap: 8px; z-index: 1100;
-            animation: dropdown-pop 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: absolute; top: calc(100% + 15px); inset-inline-start: 0; width: 320px;
+            background: rgba(8, 14, 25, 0.7); backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 28px;
+            padding: 24px; box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.8), 0 0 50px rgba(0, 229, 255, 0.1);
+            display: none; flex-direction: column; gap: 12px; z-index: 1100;
+            animation: dropdown-pop 0.5s cubic-bezier(0.19, 1, 0.22, 1);
             transform-origin: top inset-inline-start;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(255,255,255,0.1) transparent;
         }
-        .profile-dropdown::-webkit-scrollbar { width: 4px; }
-        .profile-dropdown::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
         .profile-dropdown.show { display: flex; }
-        @keyframes dropdown-pop { from { opacity: 0; transform: translateY(10px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-
+        
         .dropdown-user-info {
-            padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 10px;
+            padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 5px;
+            text-align: center;
         }
-        .user-name-fancy { font-weight: 800; color: #fff; font-size: 1.1rem; letter-spacing: 0.5px; }
+        .user-name-fancy { font-weight: 800; color: #fff; font-size: 1.2rem; letter-spacing: 0.5px; }
         .user-email-box {
-            font-size: 0.8rem; color: var(--text-muted); background: rgba(255,255,255,0.05);
-            padding: 6px 12px; border-radius: 8px; margin-top: 6px; word-break: break-all;
-            border: 1px solid rgba(255,255,255,0.05); display: inline-block; max-width: 100%;
+            font-size: 0.75rem; color: var(--text-muted); background: rgba(255,255,255,0.04);
+            padding: 8px 14px; border-radius: 12px; margin-top: 10px; word-break: break-all;
+            border: 1px solid rgba(255,255,255,0.08); display: block; max-height: 60px; overflow-y: auto;
         }
 
+        .dropdown-stats {
+            display: grid; grid-template-columns: 1fr; gap: 10px; margin: 10px 0;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+            padding: 12px; border-radius: 16px; text-align: center;
+        }
+
+        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
         .menu-item {
-            display: flex; align-items: center; gap: 14px; color: rgba(255,255,255,0.8); text-decoration: none;
-            padding: 12px 16px; border-radius: 14px; font-size: 0.95rem; font-weight: 600;
-            transition: all 0.2s ease; cursor: pointer; border: 1px solid transparent;
+            display: flex; align-items: center; gap: 14px; color: rgba(255,255,255,0.9); text-decoration: none;
+            padding: 12px 18px; border-radius: 16px; font-size: 0.9rem; font-weight: 600;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; border: 1px solid transparent;
+            background: rgba(255,255,255,0.02);
         }
         .menu-item:hover { 
             background: rgba(0, 229, 255, 0.1); color: var(--neon-cyan);
-            border-color: rgba(0, 229, 255, 0.15); transform: translateX(5px);
+            border-color: rgba(0, 229, 255, 0.2); transform: translateX(5px);
         }
+        .menu-item.danger { color: #ff4d4d; background: rgba(255, 77, 77, 0.05); }
+        .menu-item.danger:hover { background: rgba(255, 77, 77, 0.15); border-color: rgba(255, 77, 77, 0.2); }
         .menu-item i { font-size: 1.1rem; width: 22px; text-align: center; opacity: 0.8; }
         .menu-item.logout { color: #ff6b6b; margin-top: 5px; }
         .menu-item.logout:hover { background: rgba(255, 107, 107, 0.1); border-color: rgba(255, 107, 107, 0.2); }
@@ -720,10 +727,19 @@
     </footer>
 
     <!-- Firebase Modular SDK -->
+    <!-- Google Generative AI Library -->
+    <script type="importmap">
+    {
+        "imports": {
+            "@google/generative-ai": "https://esm.run/@google/generative-ai"
+        }
+    }
+    </script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, updateDoc, onSnapshot, getDoc, query, where, getDocs, orderBy, limit, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+        import { GoogleGenerativeAI } from "@google/generative-ai";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC7f4QH6CSRN6dAhGNm7P4kMHTv12mtdEo",
@@ -740,6 +756,7 @@
         const db = getFirestore(app);
 
         window.firebaseModular = { auth, db, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, collection, doc, setDoc, updateDoc, onSnapshot, getDoc, query, where, getDocs, orderBy, limit, addDoc, serverTimestamp };
+        window.GoogleGenerativeAIConstructor = GoogleGenerativeAI;
     </script>
 
     <!-- Libraries for Export -->
@@ -893,65 +910,48 @@
                 ? `<img src="${userState.photoURL}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" alt="User" onerror="this.parentElement.innerHTML = '${user.email[0].toUpperCase()}'">` 
                 : `<span style="font-size:1rem; color:#1a1a1a;">${user.email[0].toUpperCase()}</span>`;
             
-            const savedApiKey = localStorage.getItem('geminiApiKey') || '';
-
             chip.innerHTML = `
-                <div class="avatar" style="background:#fff;">${avatarImg}</div> 
-                <span style="font-size:0.9rem; font-weight:600;">${user.displayName || user.email.split('@')[0]}</span>
+                <div class="avatar" style="background:#fff; border: 2px solid var(--neon-cyan);">${avatarImg}</div> 
+                <span style="font-size:0.95rem; font-weight:700; color:#fff;">${user.displayName || user.email.split('@')[0]}</span>
+                
                 <div id="profileDropdown" class="profile-dropdown">
                     <div class="dropdown-user-info">
                         <div class="user-name-fancy">${user.displayName || 'Design Enthusiast'}</div>
                         <div class="user-email-box">${user.email}</div>
                     </div>
 
-                    <div class="credits-box">
-                        <div style="font-size:0.7rem; color:rgba(255,255,255,0.6); text-transform:uppercase; font-weight:700; letter-spacing:1px;">Available Credits</div>
-                        <div style="font-size:1.5rem; font-weight:800; color:var(--neon-cyan); margin-top:4px;">${userState.credits}</div>
-                    </div>
-
-                    <div class="menu-item" onclick="openUpgradeModal(event)">
-                        <i class="fa-solid fa-crown" style="color:var(--warning-orange);"></i> 
-                        <span>Get More Credits</span>
-                    </div>
-
-                    <div class="menu-item" onclick="openHistory()">
-                        <i class="fa-solid fa-clock-rotate-left"></i> 
-                        <span>My Design History</span>
-                    </div>
-
-                    <div class="api-config-section" onclick="event.stopPropagation()">
-                        <div style="font-size:0.75rem; color:var(--neon-cyan); font-weight:700; display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-                            <i class="fa-solid fa-key"></i> GEMINI API CONFIG
-                        </div>
-                        <div style="display:flex; gap:8px;">
-                            <input type="password" id="dropdownApiKeyInput" class="api-input-fancy" 
-                                   style="flex:1; margin-bottom:0;"
-                                   placeholder="Paste API Key..." value="${savedApiKey}">
-                            <button onclick="saveApiKeyFromDropdown()" class="primary-btn" style="padding:8px 12px; font-size:0.75rem; border-radius:8px;">SAVE</button>
-                        </div>
-                        <div id="saveConfirmMsg" style="font-size:0.65rem; color:var(--success-green); margin-top:6px; display:none; font-weight:700;">
-                            <i class="fa-solid fa-check"></i> KEY SAVED IN BROWSER
-                        </div>
-                        <div style="font-size:0.6rem; color:rgba(255,255,255,0.4); margin-top:6px; font-style:italic;">
-                            No server storage - stays in your browser
+                    <div class="dropdown-stats">
+                        <div class="stat-card">
+                            <div style="font-size:0.65rem; color:var(--neon-cyan); text-transform:uppercase; font-weight:800;">Account Credits</div>
+                            <div style="font-size:1.6rem; font-weight:900; color:#fff; margin-top:4px;">${userState.credits}</div>
                         </div>
                     </div>
 
-                    <div style="margin-top:10px; border-top:1px solid rgba(255,255,255,0.08); padding-top:10px;">
+                    <div class="menu-grid">
+                        <div class="menu-item" onclick="openUpgradeModal(event)">
+                            <i class="fa-solid fa-receipt" style="color:var(--neon-cyan);"></i> 
+                            <span>Transaction ID</span>
+                        </div>
+
+                        <div class="menu-item" onclick="openHistory(event)">
+                            <i class="fa-solid fa-clock-rotate-left"></i> 
+                            <span>My History</span>
+                        </div>
+
+                        <div class="menu-item" onclick="openApiSettings(event)">
+                            <i class="fa-solid fa-gear"></i> 
+                            <span>API Settings</span>
+                        </div>
+
                         ${userState.isAdmin ? `
-                        <div class="menu-item" onclick="openAdminModal()" style="color:var(--warning-orange);">
+                        <div class="menu-item" onclick="openAdminModal(event)" style="color:var(--warning-orange);">
                             <i class="fa-solid fa-user-shield"></i> 
                             <span>Admin Panel</span>
                         </div>` : ''}
-                        
-                        <div class="menu-item" onclick="openSettingsModal()">
-                            <i class="fa-solid fa-sliders"></i> 
-                            <span>Display Settings</span>
-                        </div>
 
-                        <div class="menu-item logout" onclick="signOutUser()">
-                            <i class="fa-solid fa-arrow-right-from-bracket"></i> 
-                            <span>Sign Out</span>
+                        <div class="menu-item danger" onclick="signOutUser()">
+                            <i class="fa-solid fa-power-off"></i> 
+                            <span>Logout</span>
                         </div>
                     </div>
                 </div>`;
@@ -1012,13 +1012,10 @@
                 return;
             }
 
-            const apiKey = localStorage.getItem('geminiApiKey');
-            if (!apiKey) {
-                alert("براہ کرم پروفائل میں جا کر اپنی Gemini API Key سیٹ کریں۔");
-                document.getElementById('profileDropdown')?.classList.add('show');
-                return;
-            }
-
+            const userApiKey = localStorage.getItem('geminiApiKey');
+            const defaultKey = "AIzaSyC7f4QH6CSRN6dAhGNm7P4kMHTv12mtdEo"; // User's requested default key
+            const apiKey = userApiKey || defaultKey;
+            
             document.getElementById('scanningModal').classList.remove('hidden');
             const base64Data = currentImageBase64.split(',')[1];
             const lang = document.getElementById('outputLangSelect').value;
@@ -1037,32 +1034,25 @@
             }`;
 
             try {
-                // STRICT FIX: Using v1beta and gemini-1.5-flash (NO LATEST)
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-                
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: "image/jpeg", data: base64Data } }] }] })
-                });
+                // OFFICIAL SDK IMPLEMENTATION
+                const genAI = new window.GoogleGenerativeAIConstructor(apiKey);
+                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-                const data = await response.json();
-                console.log("DEBUG: API Response Details:", {
-                    status: response.status,
-                    statusText: response.statusText,
-                    data: data
-                });
+                const result = await model.generateContent([
+                    prompt,
+                    {
+                        inlineData: {
+                            mimeType: "image/jpeg",
+                            data: base64Data
+                        }
+                    }
+                ]);
+
+                const response = await result.response;
+                const text = response.text();
                 
-                if (!response.ok) {
-                    throw new Error(data.error?.message || `HTTP error! status: ${response.status}`);
-                }
+                console.log("DEBUG: Official AI Library Response:", text);
                 
-                if (!data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
-                    throw new Error("AI returned an empty response. Check your API key or quota.");
-                }
-                
-                let text = data.candidates[0].content.parts[0].text;
-                // Robust JSON extraction
                 const jsonMatch = text.match(/\{[\s\S]*\}/);
                 if (jsonMatch) {
                     handleAnalysisResult(JSON.parse(jsonMatch[0]));
@@ -1071,18 +1061,17 @@
                 }
             } catch (e) {
                 console.error("CRITICAL DEBUG: Full Error Object:", e);
-                let readableError = e.message;
+                let readableError = e.message || "Unknown Error";
                 
-                // Specific Urdu translations for common Gemini errors
                 if (readableError.includes("API key not valid")) {
-                    readableError = "آپ کی API Key درست نہیں ہے۔ براہ کرم Google AI Studio سے نئی کی حاصل کریں۔";
+                    readableError = "آپ کی API Key درست نہیں ہے۔ براہ کرم نئی کی حاصل کریں۔";
                 } else if (readableError.includes("Quota exceeded")) {
-                    readableError = "آپ کے فری کریڈٹ (Quota) ختم ہو گئے ہیں۔ براہ کرم کچھ دیر بعد کوشش کریں۔";
-                } else if (readableError.includes("Model not found") || readableError.includes("404")) {
-                    readableError = "Gemini Model دستیاب نہیں ہے۔ شاید آپ کے ملک میں یا اس API ورژن پر یہ ماڈل بلاک ہے۔";
+                    readableError = "آپ کے فری کریڈٹ (Quota) ختم ہو گئے ہیں۔";
+                } else if (readableError.includes("Model") || readableError.includes("found")) {
+                    readableError = "Gemini Model (gemini-1.5-flash) v1beta پر دستیاب نہیں ہے۔";
                 }
                 
-                alert("تجزیہ کے دوران خرابی پیش آئی: " + readableError + "\n\n(Check console F12 for details)");
+                alert("تجزیہ کے دوران خرابی پیش آئی: " + readableError);
                 document.getElementById('scanningModal').classList.add('hidden');
             }
         };
@@ -1124,7 +1113,8 @@
             }
         }
 
-        window.openHistory = async () => {
+        window.openHistory = async (e) => {
+            if (e) e.stopPropagation();
             if (!userState.loggedIn) { alert("براہ کرم پہلے لاگ ان کریں۔"); return; }
             document.getElementById('historyModal').classList.remove('hidden');
             const fb = getFirebase();
@@ -1161,7 +1151,8 @@
         };
 
         // ================ MODALS & UTILS ================
-        window.openAdminModal = async () => {
+        window.openAdminModal = async (e) => {
+            if (e) e.stopPropagation();
             document.getElementById('adminModal').classList.remove('hidden');
             const fb = getFirebase();
             const userQ = fb.query(fb.collection(fb.db, "users"), fb.orderBy("createdAt", "desc"), fb.limit(20));
@@ -1174,7 +1165,17 @@
             });
         };
 
-        window.openSettingsModal = () => document.getElementById('settingsModal').classList.remove('hidden');
+        window.openApiSettings = (e) => {
+            if (e) e.stopPropagation();
+            document.getElementById('apiSettingsModal').classList.remove('hidden');
+            const savedApiKey = localStorage.getItem('geminiApiKey') || '';
+            document.getElementById('apiKeyInput').value = savedApiKey;
+        };
+
+        window.openSettingsModal = (e) => {
+            if (e) e.stopPropagation();
+            document.getElementById('settingsModal').classList.remove('hidden');
+        };
         
         window.saveApiKeyFromDropdown = () => {
             const input = document.getElementById('dropdownApiKeyInput');
