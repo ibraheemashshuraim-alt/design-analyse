@@ -50,6 +50,7 @@
             display: flex; justify-content: space-between; align-items: center;
             padding: 12px 60px; background: rgba(2, 6, 12, 0.85); backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-dim); font-size: 14px; z-index: 1000;
+            height: 70px;
         }
 
         .nav-left, .nav-right { display: flex; align-items: center; gap: 20px; }
@@ -230,31 +231,56 @@
         .avatar { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--neon-cyan); overflow: hidden; box-shadow: 0 0 10px rgba(0,229,255,0.3); }
 
         .profile-dropdown {
-            position: absolute; top: calc(100% + 15px); left: 0; width: 280px;
-            background: rgba(3, 10, 22, 0.98); backdrop-filter: blur(30px);
-            border: 1px solid var(--border-dim); border-radius: 20px;
-            padding: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-            display: none; flex-direction: column; gap: 15px; z-index: 1100;
-            animation: dropdown-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: absolute; top: calc(100% + 15px); left: 0; width: 300px;
+            background: rgba(8, 14, 25, 0.7); backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid rgba(0, 229, 255, 0.2); border-radius: 24px;
+            padding: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 229, 255, 0.1);
+            display: none; flex-direction: column; gap: 12px; z-index: 1100;
+            animation: dropdown-pop 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transform-origin: top left;
         }
         .profile-dropdown.show { display: flex; }
         @keyframes dropdown-pop { from { opacity: 0; transform: translateY(10px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-        .menu-item {
-            display: flex; align-items: center; gap: 12px; color: #fff; text-decoration: none;
-            padding: 10px 15px; border-radius: 12px; font-size: 0.95rem; font-weight: 500;
-            transition: 0.2s; cursor: pointer;
+        .dropdown-user-info {
+            padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 10px;
         }
-        .menu-item:hover { background: rgba(0, 229, 255, 0.1); color: var(--neon-cyan); }
-        .menu-item i { font-size: 1.1rem; width: 20px; text-align: center; }
-        .menu-item.logout { color: #ff4d4d; }
-        .menu-item.logout:hover { background: rgba(255, 77, 77, 0.1); }
+        .user-name-fancy { font-weight: 800; color: #fff; font-size: 1.1rem; letter-spacing: 0.5px; }
+        .user-email-box {
+            font-size: 0.8rem; color: var(--text-muted); background: rgba(255,255,255,0.05);
+            padding: 6px 12px; border-radius: 8px; margin-top: 6px; word-break: break-all;
+            border: 1px solid rgba(255,255,255,0.05); display: inline-block; max-width: 100%;
+        }
+
+        .menu-item {
+            display: flex; align-items: center; gap: 14px; color: rgba(255,255,255,0.8); text-decoration: none;
+            padding: 12px 16px; border-radius: 14px; font-size: 0.95rem; font-weight: 600;
+            transition: all 0.2s ease; cursor: pointer; border: 1px solid transparent;
+        }
+        .menu-item:hover { 
+            background: rgba(0, 229, 255, 0.1); color: var(--neon-cyan);
+            border-color: rgba(0, 229, 255, 0.15); transform: translateX(5px);
+        }
+        .menu-item i { font-size: 1.1rem; width: 22px; text-align: center; opacity: 0.8; }
+        .menu-item.logout { color: #ff6b6b; margin-top: 5px; }
+        .menu-item.logout:hover { background: rgba(255, 107, 107, 0.1); border-color: rgba(255, 107, 107, 0.2); }
 
         /* Credits Box */
         .credits-box {
-            background: rgba(0, 229, 255, 0.06); border: 1px solid rgba(0, 229, 255, 0.15);
-            padding: 12px 15px; border-radius: 14px; text-align: center;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.1), rgba(157, 0, 255, 0.1));
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            padding: 14px; border-radius: 18px; text-align: center; margin-bottom: 5px;
         }
+        .api-config-section {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255,255,255,0.06);
+            padding: 15px; border-radius: 18px; margin-top: 10px;
+        }
+        .api-input-fancy {
+            width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1);
+            color: #fff; padding: 10px 12px; border-radius: 10px; font-size: 0.85rem;
+            margin-top: 8px; outline: none; transition: 0.3s; font-family: monospace;
+        }
+        .api-input-fancy:focus { border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0, 229, 255, 0.2); }
 
         /* Footer */
         footer {
@@ -757,24 +783,61 @@
                 ? `<img src="${userState.photoURL}" alt="User">` 
                 : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:var(--neon-cyan); color:#000; font-weight:bold;">${user.email[0].toUpperCase()}</div>`;
             
+            const savedApiKey = localStorage.getItem('geminiApiKey') || '';
+
             chip.innerHTML = `
                 <div class="avatar">${avatarHtml}</div> 
                 <span style="font-size:0.9rem; font-weight:600;">${user.displayName || user.email.split('@')[0]}</span>
                 <div id="profileDropdown" class="profile-dropdown">
-                    <div style="padding-bottom:10px; border-bottom:1px solid var(--border-dim); margin-bottom:5px;">
-                        <div style="font-weight:700; color:#fff; font-size:0.95rem;">${user.displayName || 'User'}</div>
-                        <div style="font-size:0.75rem; color:var(--text-muted); word-break:break-all;">${user.email}</div>
+                    <div class="dropdown-user-info">
+                        <div class="user-name-fancy">${user.displayName || 'Design Enthusiast'}</div>
+                        <div class="user-email-box">${user.email}</div>
                     </div>
+
                     <div class="credits-box">
-                        <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;">Account Credits</div>
-                        <div style="font-size:1.2rem; font-weight:800; color:var(--neon-cyan);">${userState.credits}</div>
+                        <div style="font-size:0.7rem; color:rgba(255,255,255,0.6); text-transform:uppercase; font-weight:700; letter-spacing:1px;">Available Credits</div>
+                        <div style="font-size:1.5rem; font-weight:800; color:var(--neon-cyan); margin-top:4px;">${userState.credits}</div>
                     </div>
-                    <div class="menu-item" onclick="openUpgradeModal(event)"><i class="fa-solid fa-cart-shopping"></i> Buy Credits</div>
-                    <div class="menu-item" onclick="openHistory()"><i class="fa-solid fa-clock-rotate-left"></i> My History</div>
-                    <div class="menu-item" onclick="openSettingsModal()"><i class="fa-solid fa-gear"></i> Display Settings</div>
-                    <div class="menu-item" onclick="document.getElementById('apiSettingsModal').classList.remove('hidden')"><i class="fa-solid fa-key"></i> Gemini API Key</div>
-                    ${userState.isAdmin ? `<div class="menu-item" onclick="openAdminModal()" style="color:var(--warning-orange);"><i class="fa-solid fa-shield-halved"></i> Admin Control</div>` : ''}
-                    <div class="menu-item logout" onclick="signOutUser()"><i class="fa-solid fa-right-from-bracket"></i> Logout</div>
+
+                    <div class="menu-item" onclick="openUpgradeModal(event)">
+                        <i class="fa-solid fa-crown" style="color:var(--warning-orange);"></i> 
+                        <span>Get More Credits</span>
+                    </div>
+
+                    <div class="menu-item" onclick="openHistory()">
+                        <i class="fa-solid fa-clock-rotate-left"></i> 
+                        <span>My Design History</span>
+                    </div>
+
+                    <div class="api-config-section" onclick="event.stopPropagation()">
+                        <div style="font-size:0.75rem; color:var(--neon-cyan); font-weight:700; display:flex; align-items:center; gap:8px;">
+                            <i class="fa-solid fa-key"></i> GEMINI API CONFIG
+                        </div>
+                        <input type="password" id="dropdownApiKeyInput" class="api-input-fancy" 
+                               placeholder="Paste API Key here..." value="${savedApiKey}"
+                               onchange="localStorage.setItem('geminiApiKey', this.value.trim())">
+                        <div style="font-size:0.65rem; color:rgba(255,255,255,0.4); margin-top:6px; font-style:italic;">
+                            Saved locally in your browser
+                        </div>
+                    </div>
+
+                    <div style="margin-top:10px; border-top:1px solid rgba(255,255,255,0.08); padding-top:10px;">
+                        ${userState.isAdmin ? `
+                        <div class="menu-item" onclick="openAdminModal()" style="color:var(--warning-orange);">
+                            <i class="fa-solid fa-user-shield"></i> 
+                            <span>Admin Panel</span>
+                        </div>` : ''}
+                        
+                        <div class="menu-item" onclick="openSettingsModal()">
+                            <i class="fa-solid fa-sliders"></i> 
+                            <span>Display Settings</span>
+                        </div>
+
+                        <div class="menu-item logout" onclick="signOutUser()">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i> 
+                            <span>Sign Out</span>
+                        </div>
+                    </div>
                 </div>`;
             
             // Close dropdown on outside click
