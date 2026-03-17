@@ -107,16 +107,20 @@
 
         .cards-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
             flex: 1;
             min-height: 0;
+            padding: 0 80px 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
         }
 
         .dash-card {
             background: var(--bg-card);
             border: 1px solid var(--border-dim);
-            border-radius: 28px;
+            border-radius: 32px;
             backdrop-filter: blur(40px) saturate(180%);
             display: flex;
             flex-direction: column;
@@ -237,11 +241,12 @@
         }
         .profile-chip:hover { border-color: var(--neon-cyan); background: rgba(255,255,255,0.08); }
         .avatar { 
-            width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.1); 
-            overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
+            width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); 
+            overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.4); 
             display: flex; align-items: center; justify-content: center;
-            background: var(--warning-orange); color: #fff;
-            font-family: 'Roboto', sans-serif;
+            background: #ffffff; color: #1a1a1a;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
         }
 
         .profile-dropdown {
@@ -801,12 +806,12 @@
 
             const avatarImg = userState.photoURL 
                 ? `<img src="${userState.photoURL}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" alt="User" onerror="this.parentElement.innerHTML = '${user.email[0].toUpperCase()}'">` 
-                : `<span style="font-size:1.1rem; font-weight:500;">${user.email[0].toUpperCase()}</span>`;
+                : `<span style="font-size:1rem; color:#1a1a1a;">${user.email[0].toUpperCase()}</span>`;
             
             const savedApiKey = localStorage.getItem('geminiApiKey') || '';
 
             chip.innerHTML = `
-                <div class="avatar">${avatarImg}</div> 
+                <div class="avatar" style="background:#fff;">${avatarImg}</div> 
                 <span style="font-size:0.9rem; font-weight:600;">${user.displayName || user.email.split('@')[0]}</span>
                 <div id="profileDropdown" class="profile-dropdown">
                     <div class="dropdown-user-info">
