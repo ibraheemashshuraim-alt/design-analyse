@@ -60,7 +60,7 @@
             font-family: 'Outfit', sans-serif; color: #fff; direction: ltr;
             text-decoration: none;
         }
-        .brand-logo::after { content: 'v4.4'; font-size: 0.6rem; color: var(--neon-cyan); margin-left:10px; opacity: 0.6; }
+        .brand-logo::after { content: 'v4.5'; font-size: 0.6rem; color: var(--neon-cyan); margin-left:10px; opacity: 0.6; }
 
         .logo-icon {
             width: 34px; height: 34px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
@@ -878,7 +878,13 @@
                 chip.className = 'profile-chip';
                 chip.onclick = (e) => {
                     e.stopPropagation();
-                    document.getElementById('profileDropdown').classList.toggle('show');
+                    const dropdown = document.getElementById('profileDropdown');
+                    const isShowing = dropdown.classList.toggle('show');
+                    if (isShowing) {
+                        const currentKey = localStorage.getItem('geminiApiKey') || '';
+                        const input = document.getElementById('dropdownApiKeyInput');
+                        if (input) input.value = currentKey;
+                    }
                 };
                 authContainer.appendChild(chip);
             }
@@ -1006,9 +1012,12 @@
                 return;
             }
 
-            const userApiKey = localStorage.getItem('geminiApiKey');
-            const defaultApiKey = "AIzaSyC7f4QH6CSRN6dAhGNm7P4kMHTv12mtdEo"; // Falling back to Firebase key as default for stability
-            const apiKey = userApiKey || defaultApiKey;
+            const apiKey = localStorage.getItem('geminiApiKey');
+            if (!apiKey) {
+                alert("براہ کرم پروفائل میں جا کر اپنی Gemini API Key سیٹ کریں۔");
+                document.getElementById('profileDropdown')?.classList.add('show');
+                return;
+            }
 
             document.getElementById('scanningModal').classList.remove('hidden');
             const base64Data = currentImageBase64.split(',')[1];
@@ -1028,14 +1037,21 @@
             }`;
 
             try {
-                // Using v1beta and gemini-1.5-flash as requested
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                // Using v1beta and gemini-1.5-flash as requested by user
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: "image/jpeg", data: base64Data } }] }] })
                 });
 
                 const data = await response.json();
+                console.log("DEBUG: API Response Details:", {
+                    status: response.status,
+                    statusText: response.statusText,
+                    data: data
+                });
                 
                 if (!response.ok) {
                     throw new Error(data.error?.message || `HTTP error! status: ${response.status}`);
@@ -1054,13 +1070,19 @@
                     throw new Error("Invalid response format from AI. Retrying might help.");
                 }
             } catch (e) {
-                console.error("DEBUG: Gemini API Full Error Object:", e); // Detailed logging
+                console.error("CRITICAL DEBUG: Full Error Object:", e);
                 let readableError = e.message;
-                if (readableError.includes("API key not valid")) readableError = "آپ کی API Key درست نہیں ہے۔ براہ کرم پروفائل میں جا کر دوبارہ چیک کریں۔";
-                if (readableError.includes("Quota exceeded")) readableError = "آپ کے فری کریڈٹ ختم ہو گئے ہیں۔ براہ کرم کچھ دیر بعد کوشش کریں یا نئی Key ڈالیں۔";
-                if (readableError.includes("Model not found")) readableError = "Gemini Model (gemini-1.5-flash) v1beta پر دستیاب نہیں ہے۔";
                 
-                alert("تجزیہ کے دوران خرابی پیش آئی: " + readableError);
+                // Specific Urdu translations for common Gemini errors
+                if (readableError.includes("API key not valid")) {
+                    readableError = "آپ کی API Key درست نہیں ہے۔ براہ کرم Google AI Studio سے نئی کی حاصل کریں۔";
+                } else if (readableError.includes("Quota exceeded")) {
+                    readableError = "آپ کے فری کریڈٹ (Quota) ختم ہو گئے ہیں۔ براہ کرم کچھ دیر بعد کوشش کریں۔";
+                } else if (readableError.includes("Model not found") || readableError.includes("404")) {
+                    readableError = "Gemini Model دستیاب نہیں ہے۔ شاید آپ کے ملک میں یا اس API ورژن پر یہ ماڈل بلاک ہے۔";
+                }
+                
+                alert("تجزیہ کے دوران خرابی پیش آئی: " + readableError + "\n\n(Check console F12 for details)");
                 document.getElementById('scanningModal').classList.add('hidden');
             }
         };
