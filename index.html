@@ -60,7 +60,7 @@
             font-family: 'Outfit', sans-serif; color: #fff; direction: ltr;
             text-decoration: none;
         }
-        .brand-logo::after { content: 'v4.2'; font-size: 0.6rem; color: var(--neon-cyan); margin-left:10px; opacity: 0.6; }
+        .brand-logo::after { content: 'v4.3'; font-size: 0.6rem; color: var(--neon-cyan); margin-left:10px; opacity: 0.6; }
 
         .logo-icon {
             width: 34px; height: 34px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
@@ -914,14 +914,20 @@
                     </div>
 
                     <div class="api-config-section" onclick="event.stopPropagation()">
-                        <div style="font-size:0.75rem; color:var(--neon-cyan); font-weight:700; display:flex; align-items:center; gap:8px;">
+                        <div style="font-size:0.75rem; color:var(--neon-cyan); font-weight:700; display:flex; align-items:center; gap:8px; margin-bottom:8px;">
                             <i class="fa-solid fa-key"></i> GEMINI API CONFIG
                         </div>
-                        <input type="password" id="dropdownApiKeyInput" class="api-input-fancy" 
-                               placeholder="Paste API Key here..." value="${savedApiKey}"
-                               onchange="localStorage.setItem('geminiApiKey', this.value.trim())">
-                        <div style="font-size:0.65rem; color:rgba(255,255,255,0.4); margin-top:6px; font-style:italic;">
-                            Saved locally in your browser
+                        <div style="display:flex; gap:8px;">
+                            <input type="password" id="dropdownApiKeyInput" class="api-input-fancy" 
+                                   style="flex:1; margin-bottom:0;"
+                                   placeholder="Paste API Key..." value="${savedApiKey}">
+                            <button onclick="saveApiKeyFromDropdown()" class="primary-btn" style="padding:8px 12px; font-size:0.75rem; border-radius:8px;">SAVE</button>
+                        </div>
+                        <div id="saveConfirmMsg" style="font-size:0.65rem; color:var(--success-green); margin-top:6px; display:none; font-weight:700;">
+                            <i class="fa-solid fa-check"></i> KEY SAVED IN BROWSER
+                        </div>
+                        <div style="font-size:0.6rem; color:rgba(255,255,255,0.4); margin-top:6px; font-style:italic;">
+                            No server storage - stays in your browser
                         </div>
                     </div>
 
@@ -1031,7 +1037,14 @@
                 });
 
                 const data = await response.json();
-                if (data.error) throw new Error(data.error.message);
+                
+                if (!response.ok) {
+                    throw new Error(data.error?.message || `HTTP error! status: ${response.status}`);
+                }
+                
+                if (!data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
+                    throw new Error("AI returned an empty response. Check your API key or quota.");
+                }
                 
                 let text = data.candidates[0].content.parts[0].text;
                 // Robust JSON extraction
@@ -1039,11 +1052,15 @@
                 if (jsonMatch) {
                     handleAnalysisResult(JSON.parse(jsonMatch[0]));
                 } else {
-                    throw new Error("Invalid response format from AI");
+                    throw new Error("Invalid response format from AI. Retrying might help.");
                 }
             } catch (e) {
-                console.error(e);
-                alert("تجزیہ کے دوران خرابی پیش آئی: " + e.message);
+                console.error("Analysis Error:", e);
+                let readableError = e.message;
+                if (readableError.includes("API key not valid")) readableError = "آپ کی API Key درست نہیں ہے۔ براہ کرم پروفائل میں جا کر دوبارہ چیک کریں۔";
+                if (readableError.includes("Quota exceeded")) readableError = "آپ کے فری کریڈٹ ختم ہو گئے ہیں۔ براہ کرم کچھ دیر بعد کوشش کریں یا نئی Key ڈالیں۔";
+                
+                alert("تجزیہ کے دوران خرابی پیش آئی: " + readableError);
                 document.getElementById('scanningModal').classList.add('hidden');
             }
         };
@@ -1136,11 +1153,28 @@
         };
 
         window.openSettingsModal = () => document.getElementById('settingsModal').classList.remove('hidden');
+        
+        window.saveApiKeyFromDropdown = () => {
+            const input = document.getElementById('dropdownApiKeyInput');
+            const val = input.value.trim();
+            if (val) {
+                localStorage.setItem('geminiApiKey', val);
+                const msg = document.getElementById('saveConfirmMsg');
+                msg.style.display = 'block';
+                setTimeout(() => msg.style.display = 'none', 3000);
+            } else {
+                alert("براہ کرم API Key درج کریں۔");
+            }
+        };
+
         window.saveApiKey = () => {
             const val = document.getElementById('apiKeyInput').value.trim();
             if (val) {
                 localStorage.setItem('geminiApiKey', val);
                 document.getElementById('apiSettingsModal').classList.add('hidden');
+                // Sync with dropdown input if it exists
+                const dropdownInput = document.getElementById('dropdownApiKeyInput');
+                if (dropdownInput) dropdownInput.value = val;
             }
         };
 
